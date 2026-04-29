@@ -1,0 +1,10 @@
+"""Import all models so Alembic autogenerate can resolve metadata."""
+
+from app.db.base_class import Base
+from app.models.order import Order
+from app.models.order_item import OrderItem
+from app.models.product import Product
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
+
+__all__ = ["Base", "Order", "OrderItem", "Product", "RefreshToken", "User"]

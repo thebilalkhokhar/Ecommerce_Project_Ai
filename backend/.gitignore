@@ -1,0 +1,79 @@
+# --- Secrets / local env (any depth) ---
+.env
+**/.env
+*.env.local
+backend/.env
+!.env.example
+!**/.env.example
+!backend/.env.example
+
+# --- Python ---
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments (root or nested, any name)
+.venv/
+venv/
+**/.venv/
+**/venv/
+env/
+ENV/
+.virtualenv/
+
+# If a venv was created without a standard folder name: block accidental check-ins
+**/site-packages/
+**/Lib/site-packages/
+
+.pytest_cache/
+**/.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+wheels/
+
+# --- Backend local runtime data (FAISS, uploads, etc.) ---
+backend/data/
+
+# --- Node / frontend ---
+node_modules/
+**/node_modules/
+.next/
+out/
+.nuxt/
+.turbo/
+.cache/
+
+# --- IDE / OS ---
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Service / app artifacts ---
+ai-service/storage/
+/storage/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Coverage ---
+htmlcov/
+.coverage*
+coverage.xml
+
+# --- Large local tooling (often under project path) ---
+.cursor/
