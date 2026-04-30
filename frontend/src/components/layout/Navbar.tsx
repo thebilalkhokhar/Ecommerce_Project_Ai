@@ -42,6 +42,15 @@ export function Navbar() {
             </Link>
           )}
 
+          {isAuthenticated && (
+            <Link
+              href="/profile"
+              className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
+            >
+              Profile
+            </Link>
+          )}
+
           {isAuthenticated ? (
             <button
               type="button"
