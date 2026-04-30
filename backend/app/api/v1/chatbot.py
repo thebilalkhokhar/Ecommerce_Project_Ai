@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
 
-from app.agents.graph import app_graph
+from app.services.ai.agent import app_graph
 
 router = APIRouter()
 

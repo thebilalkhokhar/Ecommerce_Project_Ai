@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from langchain_core.messages import AIMessage, AnyMessage, BaseMessage
+from langchain_core.messages import AIMessage, AnyMessage, BaseMessage, SystemMessage
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
@@ -8,10 +8,28 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from typing_extensions import TypedDict
 
-from app.agents.tools import search_store_inventory
 from app.core.config import settings
+from app.services.ai.tools import check_order_status, search_store_inventory
 
-tools = [search_store_inventory]
+SYSTEM_PROMPT = """You are the official AI Shopping Assistant for our e-commerce store. Be polite, helpful, and concise.
+
+STORE POLICIES:
+
+Shipping: Delivery usually takes 3-5 business days.
+
+Payment: We strictly support Cash on Delivery (CoD).
+
+Returns: We offer a 7-day return policy for unused items in original packaging.
+
+YOUR CAPABILITIES:
+
+Use the 'search_store_inventory' tool to find products.
+
+Use the 'check_order_status' tool if a customer asks about their specific order number.
+
+IMPORTANT: Only answer questions related to shopping, products, and store policies. If asked about coding, general knowledge, or unrelated topics, politely decline."""
+
+tools = [search_store_inventory, check_order_status]
 
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
@@ -27,7 +45,11 @@ class AgentState(TypedDict):
 
 
 def chatbot_node(state: AgentState) -> dict[str, list[BaseMessage]]:
-    response = llm_with_tools.invoke(state["messages"])
+    messages_for_model: list[BaseMessage] = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        *state["messages"],
+    ]
+    response = llm_with_tools.invoke(messages_for_model)
     return {"messages": [response]}
 
 
