@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -24,6 +25,14 @@ class OrderItemOut(BaseModel):
     unit_price: Decimal
 
 
+class OrderUserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    full_name: str | None = None
+
+
 class OrderOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,6 +41,8 @@ class OrderOut(BaseModel):
     total_price: Decimal
     status: OrderStatus
     is_cod: bool
+    created_at: datetime | None = None
+    user: OrderUserOut | None = None
     items: list[OrderItemOut]
 
 

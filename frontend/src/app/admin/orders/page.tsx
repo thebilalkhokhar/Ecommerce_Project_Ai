@@ -15,12 +15,20 @@ const STATUSES = [
 
 type OrderStatus = (typeof STATUSES)[number];
 
+type OrderUser = {
+  id: number;
+  email: string;
+  full_name: string | null;
+};
+
 type AdminOrder = {
   id: number;
   user_id: number;
   total_price: string | number;
   status: OrderStatus;
   is_cod: boolean;
+  created_at?: string | null;
+  user?: OrderUser | null;
 };
 
 function formatMoney(amount: string | number): string {
@@ -32,6 +40,24 @@ function formatMoney(amount: string | number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(Number.isFinite(n) ? n : 0);
+}
+
+function formatOrderDate(iso: string | null | undefined): string {
+  if (iso == null || iso === "") return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function customerLabel(order: AdminOrder): string {
+  const u = order.user;
+  if (u?.full_name?.trim()) return u.full_name.trim();
+  if (u?.email) return u.email;
+  return `User #${order.user_id}`;
 }
 
 export default function AdminOrdersPage() {
@@ -126,11 +152,11 @@ export default function AdminOrdersPage() {
                   <td className="px-4 py-3 tabular-nums text-zinc-300">
                     #{order.id}
                   </td>
-                  <td className="px-4 py-3 text-zinc-500">
-                    <span title="Order date not stored in API">—</span>
+                  <td className="px-4 py-3 text-zinc-400">
+                    {formatOrderDate(order.created_at)}
                   </td>
-                  <td className="px-4 py-3 text-zinc-300">
-                    User #{order.user_id}
+                  <td className="max-w-[200px] truncate px-4 py-3 text-zinc-300" title={customerLabel(order)}>
+                    {customerLabel(order)}
                   </td>
                   <td className="px-4 py-3 tabular-nums text-zinc-200">
                     {formatMoney(order.total_price)}

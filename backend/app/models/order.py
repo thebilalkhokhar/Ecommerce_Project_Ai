@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import enum
+from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Enum as SQLEnum, ForeignKey, Numeric
+from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
 
 from app.db.base_class import Base
 
@@ -32,6 +34,11 @@ class Order(Base):
         nullable=False,
     )
     is_cod: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
 
     user: Mapped[User] = relationship("User", back_populates="orders")
     items: Mapped[list[OrderItem]] = relationship(

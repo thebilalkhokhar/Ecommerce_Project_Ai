@@ -66,7 +66,7 @@ def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
     stmt = (
         select(Order)
         .where(Order.id == order_pk)
-        .options(selectinload(Order.items))
+        .options(selectinload(Order.items), selectinload(Order.user))
     )
     return db.scalars(stmt).one()
 
@@ -75,7 +75,7 @@ def get_user_orders(db: Session, user_id: int) -> list[Order]:
     stmt = (
         select(Order)
         .where(Order.user_id == user_id)
-        .options(selectinload(Order.items))
+        .options(selectinload(Order.items), selectinload(Order.user))
         .order_by(Order.id.desc())
     )
     return list(db.scalars(stmt).unique().all())
@@ -86,6 +86,7 @@ def get_all_orders(db: Session, skip: int = 0, limit: int = 100) -> list[Order]:
         select(Order)
         .options(
             selectinload(Order.items).selectinload(OrderItem.product),
+            selectinload(Order.user),
         )
         .order_by(Order.id.desc())
         .offset(skip)
@@ -107,6 +108,6 @@ def update_order_status(db: Session, order_id: int, new_status: OrderStatus) -> 
     stmt = (
         select(Order)
         .where(Order.id == order.id)
-        .options(selectinload(Order.items))
+        .options(selectinload(Order.items), selectinload(Order.user))
     )
     return db.scalars(stmt).one()

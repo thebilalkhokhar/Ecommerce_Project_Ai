@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_admin_user, get_current_user, get_db
+from app.api.deps import get_admin_user, get_db
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductOut
+from app.schemas.product import ProductCreate, ProductOut, ProductUpdate
 from app.services.crud import crud_product
 from app.utils.cloudinary_client import upload_image
 from app.vector_store.faiss_manager import get_faiss_manager
@@ -37,12 +37,56 @@ def list_products(
 def create_product(
     product_in: ProductCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    _admin: User = Depends(get_admin_user),
 ) -> ProductOut:
     product = crud_product.create_product(db, product_in)
     text = f"{product.name}. {product.description or ''}".strip()
     get_faiss_manager().add_product_vector(product.id, text)
     return ProductOut.model_validate(product)
+
+
+@router.put(
+    "/{product_id}",
+    response_model=ProductOut,
+)
+def update_product(
+    product_id: int,
+    product_in: ProductUpdate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_admin_user),
+) -> ProductOut:
+    product = crud_product.update_product(db, product_id, product_in)
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    return ProductOut.model_validate(product)
+
+
+@router.delete(
+    "/{product_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def remove_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_admin_user),
+) -> None:
+    try:
+        crud_product.delete_product(db, product_id)
+    except ValueError as exc:
+        if str(exc) == "not_found":
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Product not found",
+            ) from exc
+        if str(exc) == "in_use":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Product is referenced by orders and cannot be deleted.",
+            ) from exc
+        raise
 
 
 @router.post(
