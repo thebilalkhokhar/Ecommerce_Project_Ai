@@ -11,3 +11,4 @@ class CategoryOut(BaseModel):
 
     id: int
     name: str
+    description: str | None = None

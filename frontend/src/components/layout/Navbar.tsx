@@ -4,16 +4,37 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCartStore, selectItemUnitCount } from "@/store/cartStore";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore, type AuthUser } from "@/store/authStore";
+import api from "@/lib/axios";
 
 export function Navbar() {
   const itemCount = useCartStore(selectItemUnitCount);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
     useAuthStore.getState().initAuth();
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await api.get<AuthUser>("/users/me");
+        if (!cancelled) {
+          setUser(data);
+        }
+      } catch {
+        /* token invalid or network — leave user null */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, user, setUser]);
 
   return (
     <header className="border-b border-zinc-800 bg-zinc-950">
@@ -48,6 +69,15 @@ export function Navbar() {
               className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
             >
               Profile
+            </Link>
+          )}
+
+          {isAuthenticated && user?.is_admin && (
+            <Link
+              href="/admin/orders"
+              className="text-sm font-medium text-zinc-300 transition hover:text-zinc-50"
+            >
+              Admin Panel
             </Link>
           )}
 
