@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_admin_user, get_current_user, get_db
 from app.models.user import User
 from app.schemas.product import ProductCreate, ProductOut
 from app.services.crud import crud_product
+from app.utils.cloudinary_client import upload_image
 from app.vector_store.faiss_manager import get_faiss_manager
 
 router = APIRouter()
@@ -41,4 +42,37 @@ def create_product(
     product = crud_product.create_product(db, product_in)
     text = f"{product.name}. {product.description or ''}".strip()
     get_faiss_manager().add_product_vector(product.id, text)
+    return ProductOut.model_validate(product)
+
+
+@router.post(
+    "/{product_id}/image",
+    response_model=ProductOut,
+    status_code=status.HTTP_200_OK,
+)
+async def upload_product_image(
+    product_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(get_admin_user),
+    file: UploadFile = File(...),
+) -> ProductOut:
+    data = await file.read()
+    if not data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Empty file",
+        )
+    try:
+        url = upload_image(data)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Image upload failed: {exc}",
+        ) from exc
+    product = crud_product.update_product_image(db, product_id, url)
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
     return ProductOut.model_validate(product)

@@ -11,6 +11,7 @@ class ProductCreate(BaseModel):
     price: Decimal
     stock_quantity: int = 0
     category_id: int | None = None
+    image_url: str | None = None
 
 
 class ProductOut(BaseModel):
@@ -21,4 +22,5 @@ class ProductOut(BaseModel):
     description: str | None
     price: Decimal
     stock_quantity: int
+    image_url: str | None = None
     category: CategoryOut | None = None

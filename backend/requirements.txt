@@ -1,5 +1,6 @@
 fastapi
 python-multipart
+cloudinary
 uvicorn[standard]
 sqlalchemy
 psycopg2-binary

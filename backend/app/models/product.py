@@ -30,6 +30,7 @@ class Product(Base):
         ForeignKey("category.id", ondelete="SET NULL"),
         nullable=True,
     )
+    image_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
 
     category: Mapped[Category | None] = relationship(
         "Category",

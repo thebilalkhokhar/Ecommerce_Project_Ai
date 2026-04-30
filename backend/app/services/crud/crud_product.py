@@ -39,6 +39,7 @@ def create_product(db: Session, product_in: ProductCreate) -> Product:
         price=product_in.price,
         stock_quantity=product_in.stock_quantity,
         category_id=product_in.category_id,
+        image_url=product_in.image_url,
     )
     db.add(product)
     db.commit()
@@ -47,5 +48,20 @@ def create_product(db: Session, product_in: ProductCreate) -> Product:
         select(Product)
         .options(selectinload(Product.category))
         .where(Product.id == product.id)
+    )
+    return db.scalars(stmt).one()
+
+
+def update_product_image(db: Session, product_id: int, image_url: str) -> Product | None:
+    product = db.get(Product, product_id)
+    if product is None:
+        return None
+    product.image_url = image_url
+    db.add(product)
+    db.commit()
+    stmt = (
+        select(Product)
+        .options(selectinload(Product.category))
+        .where(Product.id == product_id)
     )
     return db.scalars(stmt).one()
