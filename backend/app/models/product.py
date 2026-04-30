@@ -3,12 +3,13 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Integer, Numeric, String, Text
+from sqlalchemy import ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
+    from app.models.category import Category
     from app.models.order_item import OrderItem
 
 
@@ -18,7 +19,15 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     stock_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    category_id: Mapped[int | None] = mapped_column(
+        ForeignKey("category.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
+    category: Mapped[Category | None] = relationship(
+        "Category",
+        back_populates="products",
+    )
     order_items: Mapped[list[OrderItem]] = relationship(
         "OrderItem",
         back_populates="product",

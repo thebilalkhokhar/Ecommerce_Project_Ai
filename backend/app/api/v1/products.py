@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
@@ -14,9 +14,18 @@ router = APIRouter()
 def list_products(
     skip: int = 0,
     limit: int = 100,
+    search: str | None = Query(None, description="Filter by name (case-insensitive substring)"),
+    category_id: int | None = Query(None, description="Filter by category id"),
     db: Session = Depends(get_db),
 ) -> list[ProductOut]:
-    return crud_product.get_products(db, skip=skip, limit=limit)
+    products = crud_product.get_products(
+        db,
+        skip=skip,
+        limit=limit,
+        search=search,
+        category_id=category_id,
+    )
+    return [ProductOut.model_validate(p) for p in products]
 
 
 @router.post(

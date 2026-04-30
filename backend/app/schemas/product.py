@@ -2,12 +2,15 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
+from app.schemas.category import CategoryOut
+
 
 class ProductCreate(BaseModel):
     name: str
     description: str | None = None
     price: Decimal
     stock_quantity: int = 0
+    category_id: int | None = None
 
 
 class ProductOut(BaseModel):
@@ -18,3 +21,4 @@ class ProductOut(BaseModel):
     description: str | None
     price: Decimal
     stock_quantity: int
+    category: CategoryOut | None = None

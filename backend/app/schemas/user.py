@@ -15,6 +15,7 @@ class UserCreate(BaseModel):
     city: str
     state: str
     postal_code: str
+    is_admin: bool = False
 
     @field_validator("phone_number")
     @classmethod

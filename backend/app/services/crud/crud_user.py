@@ -22,6 +22,7 @@ def create_user(db: Session, user_in: UserCreate) -> User:
         city=user_in.city,
         state=user_in.state,
         postal_code=user_in.postal_code,
+        is_admin=False,  # Self-registration never grants admin; set via DB/migration
     )
     db.add(user)
     db.commit()
