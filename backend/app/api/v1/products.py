@@ -29,6 +29,23 @@ def list_products(
     return [ProductOut.model_validate(p) for p in products]
 
 
+@router.get(
+    "/{product_id}",
+    response_model=ProductOut,
+)
+def get_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+) -> ProductOut:
+    product = crud_product.get_product_by_id(db, product_id)
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    return ProductOut.model_validate(product)
+
+
 @router.post(
     "",
     response_model=ProductOut,

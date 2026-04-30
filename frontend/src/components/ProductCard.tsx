@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { ImageIcon } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
@@ -34,7 +35,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-sm shadow-black/20">
-      <div className="relative aspect-square w-full overflow-hidden border-b border-zinc-800 bg-zinc-900">
+      <Link
+        href={`/products/${product.id}`}
+        className="relative aspect-square w-full overflow-hidden border-b border-zinc-800 bg-zinc-900 outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-zinc-500"
+      >
         {hasImage ? (
           <Image
             src={product.image_url!}
@@ -53,12 +57,17 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="sr-only">No product image</span>
           </div>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-1">
           <h3 className="text-[15px] font-semibold leading-snug tracking-tight text-zinc-50">
-            {product.name}
+            <Link
+              href={`/products/${product.id}`}
+              className="hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+            >
+              {product.name}
+            </Link>
           </h3>
           <p className="text-sm tabular-nums tracking-wide text-zinc-400">
             {formatPrice(product.price)}

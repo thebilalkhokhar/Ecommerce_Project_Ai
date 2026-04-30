@@ -31,5 +31,7 @@ class ProductOut(BaseModel):
     description: str | None
     price: Decimal
     stock_quantity: int
+    average_rating: Decimal = Decimal("0.00")
+    total_reviews: int = 0
     image_url: str | None = None
     category: CategoryOut | None = None

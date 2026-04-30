@@ -83,6 +83,9 @@ def delete_product(db: Session, product_id: int) -> None:
     except IntegrityError:
         db.rollback()
         raise ValueError("in_use") from None
+
+
+def update_product_image(db: Session, product_id: int, image_url: str) -> Product | None:
     product = db.get(Product, product_id)
     if product is None:
         return None
