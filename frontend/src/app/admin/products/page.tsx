@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { Loader2, ImageIcon } from "lucide-react";
+import { ImageIcon, Loader2, Pencil, Trash2 } from "lucide-react";
 import api from "@/lib/axios";
 
 type Category = {
@@ -35,10 +35,12 @@ function formatMoney(amount: string | number): string {
 }
 
 export default function AdminProductsPage() {
+  const formSectionRef = useRef<HTMLElement>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -46,6 +48,22 @@ export default function AdminProductsPage() {
   const [stock_quantity, setStockQuantity] = useState("0");
   const [category_id, setCategoryId] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  function resetForm() {
+    setEditingProduct(null);
+    setName("");
+    setDescription("");
+    setPrice("");
+    setStockQuantity("0");
+    setCategoryId("");
+    setImageFile(null);
+    const fileInput = document.getElementById(
+      "product-image",
+    ) as HTMLInputElement | null;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  }
 
   const loadData = useCallback(async () => {
     setListLoading(true);
@@ -69,6 +87,63 @@ export default function AdminProductsPage() {
     void loadData();
   }, [loadData]);
 
+  function handleEdit(product: Product) {
+    setEditingProduct(product);
+    setName(product.name);
+    setDescription(product.description ?? "");
+    const p =
+      typeof product.price === "number"
+        ? product.price
+        : Number.parseFloat(String(product.price));
+    setPrice(Number.isFinite(p) ? String(p) : "");
+    setStockQuantity(String(product.stock_quantity));
+    setCategoryId(
+      product.category?.id != null ? String(product.category.id) : "",
+    );
+    setImageFile(null);
+    const fileInput = document.getElementById(
+      "product-image",
+    ) as HTMLInputElement | null;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+    requestAnimationFrame(() => {
+      formSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  async function handleDelete(productId: number) {
+    if (!window.confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
+    try {
+      await api.delete(`/products/${productId}`);
+      toast.success("Product deleted");
+      await loadData();
+      if (editingProduct?.id === productId) {
+        resetForm();
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        toast.error(
+          "Cannot delete product: It is associated with existing orders.",
+        );
+        return;
+      }
+      let msg = "Could not delete product.";
+      if (axios.isAxiosError(err)) {
+        const detail = err.response?.data?.detail;
+        if (typeof detail === "string") {
+          msg = detail;
+        }
+      }
+      toast.error(msg);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!name.trim()) {
@@ -86,31 +161,47 @@ export default function AdminProductsPage() {
       return;
     }
 
+    const payload: Record<string, unknown> = {
+      name: name.trim(),
+      description: description.trim() === "" ? null : description.trim(),
+      price: priceNum,
+      stock_quantity: stockNum,
+      category_id:
+        category_id === ""
+          ? null
+          : Number.parseInt(category_id, 10),
+    };
+
     setIsSubmitting(true);
     try {
-      const payload: Record<string, unknown> = {
-        name: name.trim(),
-        description: description.trim() === "" ? null : description.trim(),
-        price: priceNum,
-        stock_quantity: stockNum,
-      };
-      if (category_id !== "") {
-        const cid = Number.parseInt(category_id, 10);
-        if (Number.isFinite(cid)) {
-          payload.category_id = cid;
-        }
-      }
+      let productId: number;
 
-      const { data: newProduct } = await api.post<Product>("/products", payload);
-      const id = newProduct?.id;
-      if (id == null) {
-        throw new Error("Invalid product response");
+      if (editingProduct) {
+        const { data } = await api.put<Product>(
+          `/products/${editingProduct.id}`,
+          payload,
+        );
+        if (data?.id == null) {
+          throw new Error("Invalid product response");
+        }
+        productId = data.id;
+        toast.success("Product updated successfully.");
+      } else {
+        const { data: newProduct } = await api.post<Product>(
+          "/products",
+          payload,
+        );
+        if (newProduct?.id == null) {
+          throw new Error("Invalid product response");
+        }
+        productId = newProduct.id;
+        toast.success("Product created successfully.");
       }
 
       if (imageFile) {
         const formData = new FormData();
         formData.append("file", imageFile);
-        await api.post(`/products/${id}/image`, formData, {
+        await api.post(`/products/${productId}/image`, formData, {
           transformRequest: [
             (data, headers) => {
               if (data instanceof FormData) {
@@ -122,21 +213,12 @@ export default function AdminProductsPage() {
         });
       }
 
-      toast.success("Product created successfully.");
-      setName("");
-      setDescription("");
-      setPrice("");
-      setStockQuantity("0");
-      setCategoryId("");
-      setImageFile(null);
-      const fileInput = document.getElementById(
-        "product-image",
-      ) as HTMLInputElement | null;
-      if (fileInput) fileInput.value = "";
-
+      resetForm();
       await loadData();
     } catch (err) {
-      let msg = "Could not create product.";
+      let msg = editingProduct
+        ? "Could not update product."
+        : "Could not create product.";
       if (axios.isAxiosError(err)) {
         const detail = err.response?.data?.detail;
         if (typeof detail === "string") {
@@ -149,6 +231,8 @@ export default function AdminProductsPage() {
     }
   }
 
+  const isEditing = editingProduct != null;
+
   return (
     <div>
       <header className="mb-8 border-b border-zinc-800 pb-6">
@@ -156,13 +240,13 @@ export default function AdminProductsPage() {
           Products
         </h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Add products and optional cover images.
+          Add, edit, or remove catalog items and images.
         </p>
       </header>
 
-      <section className="mb-12">
+      <section ref={formSectionRef} className="mb-12">
         <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
-          Add product
+          {isEditing ? "Edit Product" : "Add New Product"}
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -276,7 +360,7 @@ export default function AdminProductsPage() {
               />
             </div>
           </div>
-          <div className="md:col-span-2">
+          <div className="flex flex-wrap items-center gap-3 md:col-span-2">
             <button
               type="submit"
               disabled={isSubmitting}
@@ -287,10 +371,21 @@ export default function AdminProductsPage() {
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                   Saving…
                 </>
+              ) : isEditing ? (
+                "Update Product"
               ) : (
                 "Create product"
               )}
             </button>
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => resetForm()}
+                className="rounded-md border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </form>
       </section>
@@ -310,7 +405,7 @@ export default function AdminProductsPage() {
           </p>
         ) : (
           <div className="overflow-x-auto rounded-lg border border-zinc-800">
-            <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[800px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-zinc-800 bg-zinc-900/60">
                   <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -327,6 +422,9 @@ export default function AdminProductsPage() {
                   </th>
                   <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
                     Category
+                  </th>
+                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -368,6 +466,26 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="px-3 py-2 text-zinc-400">
                         {p.category?.name ?? "—"}
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(p)}
+                            className="rounded-md p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-100"
+                            aria-label={`Edit ${p.name}`}
+                          >
+                            <Pencil className="h-4 w-4" strokeWidth={1.5} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleDelete(p.id)}
+                            className="rounded-md p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-red-400"
+                            aria-label={`Delete ${p.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
