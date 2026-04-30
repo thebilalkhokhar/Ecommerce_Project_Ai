@@ -16,9 +16,10 @@ if TYPE_CHECKING:
 
 class OrderStatus(str, enum.Enum):
     pending = "pending"
-    confirmed = "confirmed"
+    processing = "processing"
     shipped = "shipped"
     delivered = "delivered"
+    cancelled = "cancelled"
 
 
 class Order(Base):

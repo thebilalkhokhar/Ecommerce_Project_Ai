@@ -79,3 +79,34 @@ def get_user_orders(db: Session, user_id: int) -> list[Order]:
         .order_by(Order.id.desc())
     )
     return list(db.scalars(stmt).unique().all())
+
+
+def get_all_orders(db: Session, skip: int = 0, limit: int = 100) -> list[Order]:
+    stmt = (
+        select(Order)
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product),
+        )
+        .order_by(Order.id.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).unique().all())
+
+
+def update_order_status(db: Session, order_id: int, new_status: OrderStatus) -> Order:
+    order = db.get(Order, order_id)
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    order.status = new_status
+    db.add(order)
+    db.commit()
+    stmt = (
+        select(Order)
+        .where(Order.id == order.id)
+        .options(selectinload(Order.items))
+    )
+    return db.scalars(stmt).one()

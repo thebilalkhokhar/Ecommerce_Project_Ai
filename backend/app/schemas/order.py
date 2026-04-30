@@ -33,3 +33,9 @@ class OrderOut(BaseModel):
     status: OrderStatus
     is_cod: bool
     items: list[OrderItemOut]
+
+
+class OrderStatusUpdate(BaseModel):
+    """Admin-only status transition; values must match OrderStatus."""
+
+    status: OrderStatus

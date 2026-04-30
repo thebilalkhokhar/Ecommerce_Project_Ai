@@ -10,6 +10,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from app.models.order import Order
     from app.models.refresh_token import RefreshToken
+    from app.models.review import Review
 
 
 class User(Base):
@@ -35,4 +36,8 @@ class User(Base):
         "Order",
         back_populates="user",
         cascade="all, delete-orphan",
+    )
+    reviews: Mapped[list[Review]] = relationship(
+        "Review",
+        back_populates="user",
     )

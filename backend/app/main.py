@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.db.base  # noqa: F401 — register all models before API imports configure mappers
+
 from app.api.v1.api import api_router
 
 app = FastAPI(

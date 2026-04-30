@@ -11,6 +11,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from app.models.category import Category
     from app.models.order_item import OrderItem
+    from app.models.review import Review
 
 
 class Product(Base):
@@ -19,6 +20,12 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     stock_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    average_rating: Mapped[Decimal] = mapped_column(
+        Numeric(3, 2),
+        default=Decimal("0.00"),
+        nullable=False,
+    )
+    total_reviews: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     category_id: Mapped[int | None] = mapped_column(
         ForeignKey("category.id", ondelete="SET NULL"),
         nullable=True,
@@ -31,4 +38,9 @@ class Product(Base):
     order_items: Mapped[list[OrderItem]] = relationship(
         "OrderItem",
         back_populates="product",
+    )
+    reviews: Mapped[list[Review]] = relationship(
+        "Review",
+        back_populates="product",
+        cascade="all, delete-orphan",
     )
