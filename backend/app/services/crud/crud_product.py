@@ -33,6 +33,23 @@ def get_product_by_id(db: Session, product_id: int) -> Product | None:
     return db.scalars(stmt).first()
 
 
+def get_related_products(
+    db: Session,
+    product_id: int,
+    category_id: int | None,
+    limit: int = 4,
+) -> list[Product]:
+    stmt = (
+        select(Product)
+        .options(selectinload(Product.category))
+        .where(Product.id != product_id)
+    )
+    if category_id is not None:
+        stmt = stmt.where(Product.category_id == category_id)
+    stmt = stmt.order_by(Product.id.desc()).limit(limit)
+    return list(db.scalars(stmt).all())
+
+
 def create_product(db: Session, product_in: ProductCreate) -> Product:
     product = Product(
         name=product_in.name,

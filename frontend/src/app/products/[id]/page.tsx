@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImageIcon } from "lucide-react";
 import { fetchProductById } from "@/lib/api";
+import { RelatedProducts } from "@/components/products/RelatedProducts";
 import { ProductReviews } from "@/components/reviews/ProductReviews";
 import { ProductDetailActions } from "./ProductDetailActions";
 
@@ -126,6 +127,10 @@ export default async function ProductDetailPage({
       </div>
 
       <ProductReviews productId={product.id} />
+
+      <section className="mt-16 border-t border-zinc-800 bg-zinc-950 pt-8">
+        <RelatedProducts productId={product.id} />
+      </section>
     </div>
   );
 }

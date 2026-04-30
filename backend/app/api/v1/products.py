@@ -30,6 +30,29 @@ def list_products(
 
 
 @router.get(
+    "/{product_id}/related",
+    response_model=list[ProductOut],
+)
+def get_related_products(
+    product_id: int,
+    db: Session = Depends(get_db),
+) -> list[ProductOut]:
+    product = crud_product.get_product_by_id(db, product_id)
+    if product is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    related = crud_product.get_related_products(
+        db,
+        product_id,
+        product.category_id,
+        limit=4,
+    )
+    return [ProductOut.model_validate(p) for p in related]
+
+
+@router.get(
     "/{product_id}",
     response_model=ProductOut,
 )
