@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.order import Order
     from app.models.refresh_token import RefreshToken
     from app.models.review import Review
+    from app.models.wishlist import Wishlist
 
 
 class User(Base):
@@ -40,4 +41,9 @@ class User(Base):
     reviews: Mapped[list[Review]] = relationship(
         "Review",
         back_populates="user",
+    )
+    wishlist_entries: Mapped[list[Wishlist]] = relationship(
+        "Wishlist",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )

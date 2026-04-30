@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.category import Category
     from app.models.order_item import OrderItem
     from app.models.review import Review
+    from app.models.wishlist import Wishlist
 
 
 class Product(Base):
@@ -44,4 +45,8 @@ class Product(Base):
         "Review",
         back_populates="product",
         cascade="all, delete-orphan",
+    )
+    wishlist_entries: Mapped[list[Wishlist]] = relationship(
+        "Wishlist",
+        back_populates="product",
     )

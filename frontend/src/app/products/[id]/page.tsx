@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ImageIcon } from "lucide-react";
 import { fetchProductById } from "@/lib/api";
 import { ProductReviews } from "@/components/reviews/ProductReviews";
-import { AddToCartPdp } from "./AddToCartPdp";
+import { ProductDetailActions } from "./ProductDetailActions";
 
 function formatPrice(value: string | number): string {
   const n =
@@ -116,7 +116,7 @@ export default async function ProductDetailPage({
               {product.description}
             </p>
           ) : null}
-          <AddToCartPdp
+          <ProductDetailActions
             productId={product.id}
             name={product.name}
             price={safePrice}

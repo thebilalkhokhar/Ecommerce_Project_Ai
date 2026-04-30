@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { useCartStore, selectItemUnitCount } from "@/store/cartStore";
 import { useAuthStore, type AuthUser } from "@/store/authStore";
 import api from "@/lib/axios";
@@ -95,6 +95,17 @@ export function Navbar() {
               className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
             >
               Login
+            </Link>
+          )}
+
+          {isAuthenticated && (
+            <Link
+              href="/wishlist"
+              className="flex items-center gap-1 text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
+              aria-label="Wishlist"
+            >
+              <Heart className="h-4 w-4" strokeWidth={1.75} />
+              <span className="hidden sm:inline">Wishlist</span>
             </Link>
           )}
 

@@ -5,6 +5,7 @@ from app.models.product import Product
 from app.models.refresh_token import RefreshToken
 from app.models.review import Review, ReviewReaction
 from app.models.user import User
+from app.models.wishlist import Wishlist
 
 __all__ = [
     "Category",
@@ -16,4 +17,5 @@ __all__ = [
     "Review",
     "ReviewReaction",
     "User",
+    "Wishlist",
 ]
