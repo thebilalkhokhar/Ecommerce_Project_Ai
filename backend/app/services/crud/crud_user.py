@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserUpdate
 
 
 def get_user_by_email(db: Session, email: str) -> User | None:
@@ -28,3 +28,12 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def update_profile(db: Session, db_user: User, update_data: UserUpdate) -> User:
+    for key, value in update_data.model_dump(exclude_unset=True).items():
+        setattr(db_user, key, value)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user

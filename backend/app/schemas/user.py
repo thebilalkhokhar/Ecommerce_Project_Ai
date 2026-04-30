@@ -27,6 +27,29 @@ class UserCreate(BaseModel):
         return v
 
 
+class UserUpdate(BaseModel):
+    """Partial profile update; excludes email, password, and is_admin."""
+
+    full_name: str | None = None
+    phone_number: str | None = None
+    address_line_1: str | None = None
+    address_line_2: str | None = None
+    city: str | None = None
+    state: str | None = None
+    postal_code: str | None = None
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_pk_phone(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not _PK_PHONE_RE.fullmatch(v):
+            raise ValueError(
+                "Phone number must be a valid Pakistani mobile (e.g. +923134432915, 03134432915)."
+            )
+        return v
+
+
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
