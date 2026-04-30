@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import toast from "react-hot-toast";
-import { Package } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
 export type ProductCardData = {
@@ -9,6 +10,7 @@ export type ProductCardData = {
   name: string;
   price: number;
   stock_quantity: number;
+  image_url?: string | null;
 };
 
 type ProductCardProps = {
@@ -27,16 +29,30 @@ function formatPrice(value: number): string {
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const outOfStock = product.stock_quantity <= 0;
+  const hasImage =
+    typeof product.image_url === "string" && product.image_url.length > 0;
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
-      <div className="flex aspect-4/3 items-center justify-center bg-zinc-900">
-        <Package
-          className="h-12 w-12 text-zinc-600"
-          strokeWidth={1.25}
-          aria-hidden
-        />
-        <span className="sr-only">No product image</span>
+    <article className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-sm shadow-black/20">
+      <div className="relative aspect-square w-full overflow-hidden border-b border-zinc-800 bg-zinc-900">
+        {hasImage ? (
+          <Image
+            src={product.image_url!}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <ImageIcon
+              className="h-10 w-10 text-zinc-600"
+              strokeWidth={1.25}
+              aria-hidden
+            />
+            <span className="sr-only">No product image</span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
