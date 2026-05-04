@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppToaster } from "@/components/AppToaster";
 import { ChatbotWidget } from "@/components/ChatbotWidget";
+import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
@@ -33,7 +34,8 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-50">
         <Navbar />
         <AppToaster />
-        {children}
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        <Footer />
         <ChatbotWidget />
       </body>
     </html>

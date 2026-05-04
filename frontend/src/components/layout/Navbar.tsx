@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Heart, ShoppingCart } from "lucide-react";
+import {
+  Heart,
+  LayoutGrid,
+  LogIn,
+  LogOut,
+  Menu,
+  Package,
+  ShieldCheck,
+  ShoppingBag,
+  User,
+  X,
+} from "lucide-react";
 import { useCartStore, selectItemUnitCount } from "@/store/cartStore";
 import { useAuthStore, type AuthUser } from "@/store/authStore";
 import api from "@/lib/axios";
@@ -13,6 +24,7 @@ export function Navbar() {
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
   const logout = useAuthStore((s) => s.logout);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     useAuthStore.getState().initAuth();
@@ -36,91 +48,161 @@ export function Navbar() {
     };
   }, [isAuthenticated, user, setUser]);
 
-  return (
-    <header className="border-b border-zinc-800 bg-zinc-950">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link
-          href="/"
-          className="text-lg font-semibold tracking-tight text-zinc-50"
-        >
-          ShopOne
-        </Link>
+  const closeMobile = () => setIsMobileMenuOpen(false);
 
-        <nav className="flex items-center gap-6">
-          <Link
-            href="/products"
-            className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
+  const linkDesktop =
+    "inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-50";
+
+  const linkMobile =
+    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-50";
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3 md:flex-initial">
+          <button
+            type="button"
+            aria-expanded={isMobileMenuOpen}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            className="inline-flex rounded-md p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50 md:hidden"
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
           >
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" strokeWidth={1.75} />
+            ) : (
+              <Menu className="h-5 w-5" strokeWidth={1.75} />
+            )}
+          </button>
+          <Link
+            href="/"
+            className="truncate text-lg font-semibold tracking-tight text-zinc-50"
+            onClick={closeMobile}
+          >
+            ShopOne
+          </Link>
+        </div>
+
+        <nav
+          className="hidden items-center gap-5 md:flex md:flex-1 md:justify-center lg:gap-7"
+          aria-label="Main"
+        >
+          <Link href="/products" className={linkDesktop}>
+            <LayoutGrid className="h-4 w-4 opacity-80" strokeWidth={1.75} />
             Products
           </Link>
-
           {isAuthenticated && (
-            <Link
-              href="/orders"
-              className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
-            >
+            <Link href="/orders" className={linkDesktop}>
+              <Package className="h-4 w-4 opacity-80" strokeWidth={1.75} />
               Orders
             </Link>
           )}
-
           {isAuthenticated && (
-            <Link
-              href="/profile"
-              className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
-            >
+            <Link href="/profile" className={linkDesktop}>
+              <User className="h-4 w-4 opacity-80" strokeWidth={1.75} />
               Profile
             </Link>
           )}
-
           {isAuthenticated && user?.is_admin && (
-            <Link
-              href="/admin/orders"
-              className="text-sm font-medium text-zinc-300 transition hover:text-zinc-50"
-            >
-              Admin Panel
+            <Link href="/admin" className={linkDesktop}>
+              <ShieldCheck className="h-4 w-4 opacity-80" strokeWidth={1.75} />
+              Admin
             </Link>
           )}
-
           {isAuthenticated ? (
             <button
               type="button"
               onClick={() => logout()}
-              className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
+              className={linkDesktop}
             >
+              <LogOut className="h-4 w-4 opacity-80" strokeWidth={1.75} />
               Logout
             </button>
           ) : (
-            <Link
-              href="/login"
-              className="text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
-            >
+            <Link href="/login" className={linkDesktop}>
+              <LogIn className="h-4 w-4 opacity-80" strokeWidth={1.75} />
               Login
             </Link>
           )}
+        </nav>
 
-          {isAuthenticated && (
-            <Link
-              href="/wishlist"
-              className="flex items-center gap-1 text-sm font-medium text-zinc-400 transition hover:text-zinc-50"
-              aria-label="Wishlist"
-            >
-              <Heart className="h-4 w-4" strokeWidth={1.75} />
-              <span className="hidden sm:inline">Wishlist</span>
-            </Link>
-          )}
-
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <Link
+            href="/wishlist"
+            className="rounded-md p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50"
+            aria-label="Wishlist"
+          >
+            <Heart className="h-5 w-5" strokeWidth={1.75} />
+          </Link>
           <Link
             href="/cart"
-            className="relative flex items-center gap-1.5 rounded-md p-2 text-zinc-300 transition hover:bg-zinc-900"
+            className="relative flex items-center rounded-md p-2 text-zinc-300 transition hover:bg-zinc-900"
             aria-label={`Cart, ${itemCount} items`}
           >
-            <ShoppingCart className="h-5 w-5" strokeWidth={1.5} />
+            <ShoppingBag className="h-5 w-5" strokeWidth={1.75} />
             {itemCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-zinc-50 px-1 text-[10px] font-medium text-zinc-950">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
           </Link>
+        </div>
+      </div>
+
+      <div
+        className={`md:hidden overflow-hidden border-b border-zinc-800 bg-zinc-950 transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? "max-h-[28rem] opacity-100"
+            : "max-h-0 border-transparent opacity-0"
+        }`}
+        id="mobile-nav"
+      >
+        <nav
+          className="mx-auto max-w-6xl space-y-0.5 px-4 py-4"
+          aria-label="Mobile"
+        >
+          <Link href="/products" className={linkMobile} onClick={closeMobile}>
+            <LayoutGrid className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+            Products
+          </Link>
+          {isAuthenticated && (
+            <Link href="/orders" className={linkMobile} onClick={closeMobile}>
+              <Package className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              Orders
+            </Link>
+          )}
+          {isAuthenticated && (
+            <Link href="/profile" className={linkMobile} onClick={closeMobile}>
+              <User className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              Profile
+            </Link>
+          )}
+          {isAuthenticated && user?.is_admin && (
+            <Link href="/admin" className={linkMobile} onClick={closeMobile}>
+              <ShieldCheck
+                className="h-4 w-4 text-zinc-500"
+                strokeWidth={1.75}
+              />
+              Admin
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className={`${linkMobile} w-full text-left`}
+              onClick={() => {
+                logout();
+                closeMobile();
+              }}
+            >
+              <LogOut className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              Logout
+            </button>
+          ) : (
+            <Link href="/login" className={linkMobile} onClick={closeMobile}>
+              <LogIn className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              Login
+            </Link>
+          )}
         </nav>
       </div>
     </header>

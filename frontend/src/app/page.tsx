@@ -1,5 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
@@ -58,25 +62,49 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-zinc-950">
-      <section className="border-b border-zinc-800/80 px-4 py-20 md:py-28">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8">
-          <div className="max-w-2xl space-y-6">
+      <section className="border-b border-zinc-800/80 px-4 py-16 md:py-24 lg:py-28">
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+          <div className="flex flex-col justify-center space-y-8">
             <p className="text-xs font-medium uppercase tracking-[0.25em] text-zinc-500">
               ShopOne
             </p>
-            <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-50 md:text-5xl lg:text-6xl">
-              Elevate Your Everyday
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-zinc-50 md:text-6xl md:leading-[1.02] lg:text-7xl">
+              Elevate your everyday
             </h1>
-            <p className="max-w-md text-sm leading-relaxed text-zinc-400 md:text-base">
-              Refined essentials and contemporary picks — search, filter, and
-              shop with a calm, minimal storefront.
+            <p className="max-w-lg text-lg leading-relaxed text-zinc-400 md:text-xl">
+              A premium edit of essentials — quiet luxury, honest materials, and
+              a storefront designed to feel as refined as what you wear.
             </p>
-            <Link
-              href="/products"
-              className="inline-flex w-fit items-center rounded-md bg-zinc-50 px-8 py-3 text-sm font-medium tracking-wide text-zinc-900 transition-colors hover:bg-zinc-200"
-            >
-              Shop Now
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center rounded-lg bg-zinc-50 px-8 py-3.5 text-sm font-semibold tracking-wide text-zinc-950 transition-colors hover:bg-zinc-200"
+              >
+                Shop now
+              </Link>
+              <Link
+                href="/categories"
+                className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-transparent px-8 py-3.5 text-sm font-semibold tracking-wide text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-900/50"
+              >
+                Browse categories
+              </Link>
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/40 sm:aspect-[16/11] lg:aspect-[4/5] lg:max-h-[min(520px,70vh)]">
+              <Image
+                src={HERO_IMAGE}
+                alt="Minimal clothing boutique interior with racks and warm lighting"
+                fill
+                priority
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"
+                aria-hidden
+              />
+            </div>
           </div>
         </div>
       </section>
