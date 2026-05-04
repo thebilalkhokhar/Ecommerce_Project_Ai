@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_admin_user, get_current_user, get_db
 from app.models.user import User
 from app.schemas.order import OrderCreate, OrderOut, OrderStatusUpdate
+from app.services import email_service
 from app.services.crud import crud_order
 
 router = APIRouter()
@@ -20,6 +21,13 @@ def checkout(
     current_user: User = Depends(get_current_user),
 ) -> OrderOut:
     order = crud_order.create_order(db, current_user, order_in)
+    email_service.send_order_confirmation_email(
+        current_user.email,
+        order.id,
+        float(order.total_price),
+        list(order.items),
+    )
+    email_service.send_admin_new_order_alert(order.id, float(order.total_price))
     return crud_order.serialize_order_out(order)
 
 
@@ -71,4 +79,10 @@ def admin_update_order_status(
     _admin: User = Depends(get_admin_user),
 ) -> OrderOut:
     order = crud_order.update_order_status(db, order_id, body.status)
+    if order.user is not None:
+        email_service.send_order_status_update_email(
+            order.user.email,
+            order.id,
+            order.status.value,
+        )
     return crud_order.serialize_order_out(order)

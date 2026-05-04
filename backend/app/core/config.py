@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     GROQ_API_KEY: str
     RESEND_API_KEY: str
+    ADMIN_EMAIL: str = ""
 
     CLOUD_NAME: str
     CLOUD_API_KEY: str = Field(
