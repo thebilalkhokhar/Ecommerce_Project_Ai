@@ -33,10 +33,14 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-50">
         <Navbar />
+        <div className="print:hidden">
         <AppToaster />
-        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col print:bg-white">{children}</div>
         <Footer />
+        <div className="print:hidden">
         <ChatbotWidget />
+        </div>
       </body>
     </html>
   );

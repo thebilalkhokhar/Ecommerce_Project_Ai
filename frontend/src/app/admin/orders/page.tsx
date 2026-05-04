@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { Printer } from "lucide-react";
 import api from "@/lib/axios";
 
 const STATUSES = [
@@ -126,7 +128,7 @@ export default function AdminOrdersPage() {
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-zinc-800">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900/50">
                 <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -143,6 +145,9 @@ export default function AdminOrdersPage() {
                 </th>
                 <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
                   Status
+                </th>
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -180,6 +185,17 @@ export default function AdminOrdersPage() {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/orders/${order.id}/receipt`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex rounded-md border border-zinc-700 p-2 text-zinc-400 transition hover:border-zinc-500 hover:bg-zinc-900 hover:text-zinc-50"
+                      aria-label={`Print receipt for order ${order.id}`}
+                    >
+                      <Printer className="h-4 w-4" strokeWidth={1.75} />
+                    </Link>
                   </td>
                 </tr>
               ))}

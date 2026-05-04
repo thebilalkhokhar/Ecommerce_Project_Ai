@@ -162,6 +162,14 @@ function OrdersContent() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-4">
+                <Link
+                  href={`/orders/${order.id}/receipt`}
+                  className="inline-flex items-center rounded-md border border-zinc-600 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-400 hover:bg-zinc-900 hover:text-zinc-50"
+                >
+                  Receipt 🧾
+                </Link>
+              </div>
             </li>
           ))}
         </ul>

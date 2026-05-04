@@ -57,7 +57,7 @@ export function Navbar() {
     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-50";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm print:hidden">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
         <div className="flex min-w-0 flex-1 items-center gap-3 md:flex-initial">
           <button
@@ -149,7 +149,7 @@ export function Navbar() {
       </div>
 
       <div
-        className={`md:hidden overflow-hidden border-b border-zinc-800 bg-zinc-950 transition-all duration-300 ease-in-out ${
+        className={`md:hidden overflow-hidden border-b border-zinc-800 bg-zinc-950 transition-all duration-300 ease-in-out print:hidden ${
           isMobileMenuOpen
             ? "max-h-[28rem] opacity-100"
             : "max-h-0 border-transparent opacity-0"

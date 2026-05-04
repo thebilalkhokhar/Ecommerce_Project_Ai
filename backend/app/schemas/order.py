@@ -25,6 +25,7 @@ class OrderItemOut(BaseModel):
     quantity: int
     unit_price: Decimal
     variant_name: str | None = None
+    product_name: str | None = None
 
 
 class OrderUserOut(BaseModel):

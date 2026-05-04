@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_admin_user, get_current_user, get_db
@@ -20,7 +20,7 @@ def checkout(
     current_user: User = Depends(get_current_user),
 ) -> OrderOut:
     order = crud_order.create_order(db, current_user, order_in)
-    return OrderOut.model_validate(order)
+    return crud_order.serialize_order_out(order)
 
 
 @router.get("", response_model=list[OrderOut])
@@ -29,7 +29,7 @@ def list_my_orders(
     current_user: User = Depends(get_current_user),
 ) -> list[OrderOut]:
     orders = crud_order.get_user_orders(db, current_user.id)
-    return [OrderOut.model_validate(o) for o in orders]
+    return [crud_order.serialize_order_out(o) for o in orders]
 
 
 @router.get("/all", response_model=list[OrderOut])
@@ -40,7 +40,27 @@ def admin_list_all_orders(
     limit: int = Query(100, ge=1, le=500),
 ) -> list[OrderOut]:
     orders = crud_order.get_all_orders(db, skip=skip, limit=limit)
-    return [OrderOut.model_validate(o) for o in orders]
+    return [crud_order.serialize_order_out(o) for o in orders]
+
+
+@router.get("/{order_id}", response_model=OrderOut)
+def get_order_detail(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> OrderOut:
+    order = crud_order.get_order_by_id(db, order_id)
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    if order.user_id != current_user.id and not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to view this order",
+        )
+    return crud_order.serialize_order_out(order)
 
 
 @router.patch("/{order_id}/status", response_model=OrderOut)
@@ -51,4 +71,4 @@ def admin_update_order_status(
     _admin: User = Depends(get_admin_user),
 ) -> OrderOut:
     order = crud_order.update_order_status(db, order_id, body.status)
-    return OrderOut.model_validate(order)
+    return crud_order.serialize_order_out(order)

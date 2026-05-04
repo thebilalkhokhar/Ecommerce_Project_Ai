@@ -101,7 +101,10 @@ def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
     stmt = (
         select(Order)
         .where(Order.id == order_pk)
-        .options(selectinload(Order.items), selectinload(Order.user))
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product),
+            selectinload(Order.user),
+        )
     )
     return db.scalars(stmt).one()
 
@@ -110,10 +113,53 @@ def get_user_orders(db: Session, user_id: int) -> list[Order]:
     stmt = (
         select(Order)
         .where(Order.user_id == user_id)
-        .options(selectinload(Order.items), selectinload(Order.user))
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product),
+            selectinload(Order.user),
+        )
         .order_by(Order.id.desc())
     )
     return list(db.scalars(stmt).unique().all())
+
+
+def get_order_by_id(db: Session, order_id: int) -> Order | None:
+    stmt = (
+        select(Order)
+        .where(Order.id == order_id)
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product),
+            selectinload(Order.user),
+        )
+    )
+    return db.scalars(stmt).unique().first()
+
+
+def serialize_order_out(order: Order):
+    from app.schemas.order import OrderItemOut, OrderOut, OrderUserOut
+
+    items = [
+        OrderItemOut(
+            id=it.id,
+            order_id=it.order_id,
+            product_id=it.product_id,
+            quantity=it.quantity,
+            unit_price=it.unit_price,
+            variant_name=it.variant_name,
+            product_name=it.product.name if it.product is not None else None,
+        )
+        for it in order.items
+    ]
+    user_out = OrderUserOut.model_validate(order.user) if order.user else None
+    return OrderOut(
+        id=order.id,
+        user_id=order.user_id,
+        total_price=order.total_price,
+        status=order.status,
+        is_cod=order.is_cod,
+        created_at=order.created_at,
+        user=user_out,
+        items=items,
+    )
 
 
 def get_all_orders(db: Session, skip: int = 0, limit: int = 100) -> list[Order]:
@@ -143,6 +189,9 @@ def update_order_status(db: Session, order_id: int, new_status: OrderStatus) -> 
     stmt = (
         select(Order)
         .where(Order.id == order.id)
-        .options(selectinload(Order.items), selectinload(Order.user))
+        .options(
+            selectinload(Order.items).selectinload(OrderItem.product),
+            selectinload(Order.user),
+        )
     )
     return db.scalars(stmt).one()
