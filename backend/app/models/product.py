@@ -3,7 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import Float, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
@@ -50,3 +50,22 @@ class Product(Base):
         "Wishlist",
         back_populates="product",
     )
+    variants: Mapped[list[ProductVariant]] = relationship(
+        "ProductVariant",
+        back_populates="product",
+        cascade="all, delete-orphan",
+    )
+
+
+class ProductVariant(Base):
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("product.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    price_adjustment: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    stock_quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    product: Mapped[Product] = relationship("Product", back_populates="variants")

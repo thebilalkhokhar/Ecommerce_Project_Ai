@@ -9,6 +9,7 @@ from app.models.order import OrderStatus
 class OrderItemCreate(BaseModel):
     product_id: int = Field(..., ge=1)
     quantity: int = Field(..., ge=1)
+    variant_name: str | None = None
 
 
 class OrderCreate(BaseModel):
@@ -23,6 +24,7 @@ class OrderItemOut(BaseModel):
     product_id: int
     quantity: int
     unit_price: Decimal
+    variant_name: str | None = None
 
 
 class OrderUserOut(BaseModel):

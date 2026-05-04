@@ -1,9 +1,16 @@
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
-from app.models.product import Product
+from app.models.product import Product, ProductVariant
 from app.schemas.product import ProductCreate, ProductUpdate
+
+
+def _product_load_options():
+    return (
+        selectinload(Product.category),
+        selectinload(Product.variants),
+    )
 
 
 def get_products(
@@ -13,7 +20,7 @@ def get_products(
     search: str | None = None,
     category_id: int | None = None,
 ) -> list[Product]:
-    stmt = select(Product).options(selectinload(Product.category))
+    stmt = select(Product).options(*_product_load_options())
 
     if search is not None and search.strip():
         stmt = stmt.where(Product.name.ilike(f"%{search.strip()}%"))
@@ -27,7 +34,7 @@ def get_products(
 def get_product_by_id(db: Session, product_id: int) -> Product | None:
     stmt = (
         select(Product)
-        .options(selectinload(Product.category))
+        .options(*_product_load_options())
         .where(Product.id == product_id)
     )
     return db.scalars(stmt).first()
@@ -41,7 +48,7 @@ def get_related_products(
 ) -> list[Product]:
     stmt = (
         select(Product)
-        .options(selectinload(Product.category))
+        .options(*_product_load_options())
         .where(Product.id != product_id)
     )
     if category_id is not None:
@@ -51,20 +58,25 @@ def get_related_products(
 
 
 def create_product(db: Session, product_in: ProductCreate) -> Product:
-    product = Product(
-        name=product_in.name,
-        description=product_in.description,
-        price=product_in.price,
-        stock_quantity=product_in.stock_quantity,
-        category_id=product_in.category_id,
-        image_url=product_in.image_url,
-    )
+    data = product_in.model_dump(exclude={"variants"})
+    variants_in = product_in.variants
+    product = Product(**data)
     db.add(product)
+    db.flush()
+    if variants_in:
+        for v in variants_in:
+            db.add(
+                ProductVariant(
+                    product_id=product.id,
+                    name=v.name,
+                    price_adjustment=v.price_adjustment,
+                    stock_quantity=v.stock_quantity,
+                )
+            )
     db.commit()
-    db.refresh(product)
     stmt = (
         select(Product)
-        .options(selectinload(Product.category))
+        .options(*_product_load_options())
         .where(Product.id == product.id)
     )
     return db.scalars(stmt).one()
@@ -78,13 +90,32 @@ def update_product(
     product = db.get(Product, product_id)
     if product is None:
         return None
-    for key, value in product_in.model_dump(exclude_unset=True).items():
+    update_data = product_in.model_dump(exclude_unset=True)
+    variants_in = update_data.pop("variants", None)
+
+    for key, value in update_data.items():
         setattr(product, key, value)
+
+    if variants_in is not None:
+        db.execute(
+            delete(ProductVariant).where(ProductVariant.product_id == product_id),
+        )
+        db.flush()
+        for row in variants_in:
+            db.add(
+                ProductVariant(
+                    product_id=product_id,
+                    name=row["name"],
+                    price_adjustment=float(row["price_adjustment"]),
+                    stock_quantity=int(row["stock_quantity"]),
+                )
+            )
+
     db.add(product)
     db.commit()
     stmt = (
         select(Product)
-        .options(selectinload(Product.category))
+        .options(*_product_load_options())
         .where(Product.id == product_id)
     )
     return db.scalars(stmt).one()
@@ -111,7 +142,7 @@ def update_product_image(db: Session, product_id: int, image_url: str) -> Produc
     db.commit()
     stmt = (
         select(Product)
-        .options(selectinload(Product.category))
+        .options(*_product_load_options())
         .where(Product.id == product_id)
     )
     return db.scalars(stmt).one()

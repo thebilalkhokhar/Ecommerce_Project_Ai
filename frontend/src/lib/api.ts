@@ -1,6 +1,14 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
+export type ProductVariantApi = {
+  id: number;
+  product_id: number;
+  name: string;
+  price_adjustment: number;
+  stock_quantity: number;
+};
+
 export type ProductDetailApi = {
   id: number;
   name: string;
@@ -11,6 +19,7 @@ export type ProductDetailApi = {
   total_reviews?: number;
   image_url?: string | null;
   category?: { id: number; name: string } | null;
+  variants?: ProductVariantApi[];
 };
 
 /** Server-side friendly fetch for the product PDP (no auth required). */

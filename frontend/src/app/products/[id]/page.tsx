@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImageIcon } from "lucide-react";
-import { fetchProductById } from "@/lib/api";
+import { fetchProductById, type ProductDetailApi } from "@/lib/api";
 import { RelatedProducts } from "@/components/products/RelatedProducts";
 import { ProductReviews } from "@/components/reviews/ProductReviews";
 import { ProductDetailActions } from "./ProductDetailActions";
@@ -31,7 +31,7 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let product;
+  let product: ProductDetailApi | null;
   try {
     product = await fetchProductById(id);
   } catch {
@@ -41,11 +41,6 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const priceNum =
-    typeof product.price === "number"
-      ? product.price
-      : Number.parseFloat(String(product.price));
-  const safePrice = Number.isFinite(priceNum) ? priceNum : 0;
   const totalReviews = product.total_reviews ?? 0;
   const avgLabel = formatAvgRating(product.average_rating);
   const hasImage =
@@ -88,9 +83,15 @@ export default async function ProductDetailPage({
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
             {product.name}
           </h1>
-          <p className="mt-2 text-2xl font-medium tabular-nums text-zinc-200">
-            {formatPrice(product.price)}
-          </p>
+          {product.variants && product.variants.length > 0 ? (
+            <p className="mt-2 text-sm text-zinc-500">
+              Select a variant below to see price and availability.
+            </p>
+          ) : (
+            <p className="mt-2 text-2xl font-medium tabular-nums text-zinc-200">
+              {formatPrice(product.price)}
+            </p>
+          )}
           <p className="mt-3 text-sm text-zinc-400">
             <span aria-hidden>⭐</span>{" "}
             <span className="tabular-nums">{avgLabel}</span>
@@ -103,26 +104,23 @@ export default async function ProductDetailPage({
               <span className="text-zinc-500"> (no reviews yet)</span>
             )}
           </p>
-          <p
-            className={`mt-4 text-sm font-medium ${
-              inStock ? "text-emerald-400/90" : "text-red-400/90"
-            }`}
-          >
-            {inStock
-              ? `${product.stock_quantity} in stock`
-              : "Out of stock"}
-          </p>
+          {!(product.variants && product.variants.length > 0) && (
+            <p
+              className={`mt-4 text-sm font-medium ${
+                inStock ? "text-emerald-400/90" : "text-red-400/90"
+              }`}
+            >
+              {inStock
+                ? `${product.stock_quantity} in stock`
+                : "Out of stock"}
+            </p>
+          )}
           {product.description ? (
             <p className="mt-6 text-sm leading-relaxed text-zinc-400">
               {product.description}
             </p>
           ) : null}
-          <ProductDetailActions
-            productId={product.id}
-            name={product.name}
-            price={safePrice}
-            stockQuantity={product.stock_quantity}
-          />
+          <ProductDetailActions key={product.id} product={product} />
         </div>
       </div>
 

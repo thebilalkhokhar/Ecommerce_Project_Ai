@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.order import Order, OrderStatus
 from app.models.order_item import OrderItem
+from app.models.product import ProductVariant
 from app.models.user import User
 from app.schemas.order import OrderCreate
 from app.services.crud import crud_product
@@ -14,7 +15,9 @@ from app.services.crud import crud_product
 def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
     try:
         calculated_total = Decimal("0.00")
-        resolved_lines: list[tuple] = []
+        resolved_lines: list[
+            tuple
+        ] = []  # product, qty, unit_price, variant_name, variant | None
 
         for line in order_in.items:
             product = crud_product.get_product_by_id(db, line.product_id)
@@ -23,16 +26,44 @@ def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Product id {line.product_id} not found",
                 )
-            if product.stock_quantity < line.quantity:
-                db.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Insufficient stock",
-                )
-            unit_price = product.price
+
+            variant: ProductVariant | None = None
+            vname: str | None = None
+            if line.variant_name and line.variant_name.strip():
+                vname = line.variant_name.strip()
+                variant = db.scalars(
+                    select(ProductVariant).where(
+                        ProductVariant.product_id == product.id,
+                        ProductVariant.name == vname,
+                    ),
+                ).first()
+                if variant is None:
+                    db.rollback()
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Variant '{vname}' not found for this product",
+                    )
+                if variant.stock_quantity < line.quantity:
+                    db.rollback()
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Insufficient stock",
+                    )
+                unit_price = product.price + Decimal(str(variant.price_adjustment))
+            else:
+                if product.stock_quantity < line.quantity:
+                    db.rollback()
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Insufficient stock",
+                    )
+                unit_price = product.price
+
             line_total = unit_price * line.quantity
             calculated_total += line_total
-            resolved_lines.append((product, line.quantity, unit_price))
+            resolved_lines.append(
+                (product, line.quantity, unit_price, vname, variant),
+            )
 
         order = Order(
             user_id=user.id,
@@ -44,16 +75,20 @@ def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
         db.flush()
         order_pk = order.id
 
-        for product, quantity, unit_price in resolved_lines:
+        for product, quantity, unit_price, name_saved, variant in resolved_lines:
             db.add(
                 OrderItem(
                     order_id=order_pk,
                     product_id=product.id,
                     quantity=quantity,
                     unit_price=unit_price,
+                    variant_name=name_saved,
                 )
             )
-            product.stock_quantity -= quantity
+            if variant is not None:
+                variant.stock_quantity -= quantity
+            else:
+                product.stock_quantity -= quantity
 
         db.commit()
     except HTTPException:

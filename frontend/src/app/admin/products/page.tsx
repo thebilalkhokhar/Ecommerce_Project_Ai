@@ -4,13 +4,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { ImageIcon, Loader2, Pencil, Trash2 } from "lucide-react";
+import { ImageIcon, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import api from "@/lib/axios";
 
 type Category = {
   id: number;
   name: string;
   description?: string | null;
+};
+
+type ProductVariant = {
+  id: number;
+  product_id: number;
+  name: string;
+  price_adjustment: number;
+  stock_quantity: number;
 };
 
 type Product = {
@@ -21,6 +29,13 @@ type Product = {
   stock_quantity: number;
   image_url: string | null;
   category: Category | null;
+  variants?: ProductVariant[];
+};
+
+type VariantFormRow = {
+  name: string;
+  price_adjustment: number;
+  stock_quantity: number;
 };
 
 function formatMoney(amount: string | number): string {
@@ -48,6 +63,7 @@ export default function AdminProductsPage() {
   const [stock_quantity, setStockQuantity] = useState("0");
   const [category_id, setCategoryId] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [variants, setVariants] = useState<VariantFormRow[]>([]);
 
   function resetForm() {
     setEditingProduct(null);
@@ -57,6 +73,7 @@ export default function AdminProductsPage() {
     setStockQuantity("0");
     setCategoryId("");
     setImageFile(null);
+    setVariants([]);
     const fileInput = document.getElementById(
       "product-image",
     ) as HTMLInputElement | null;
@@ -101,6 +118,18 @@ export default function AdminProductsPage() {
       product.category?.id != null ? String(product.category.id) : "",
     );
     setImageFile(null);
+    setVariants(
+      product.variants?.length
+        ? product.variants.map((v) => ({
+            name: v.name,
+            price_adjustment:
+              typeof v.price_adjustment === "number"
+                ? v.price_adjustment
+                : Number.parseFloat(String(v.price_adjustment)) || 0,
+            stock_quantity: v.stock_quantity,
+          }))
+        : [],
+    );
     const fileInput = document.getElementById(
       "product-image",
     ) as HTMLInputElement | null;
@@ -161,6 +190,19 @@ export default function AdminProductsPage() {
       return;
     }
 
+    const variantsPayload = variants
+      .filter((v) => v.name.trim() !== "")
+      .map((v) => ({
+        name: v.name.trim(),
+        price_adjustment: Number.isFinite(v.price_adjustment)
+          ? v.price_adjustment
+          : Number.parseFloat(String(v.price_adjustment)) || 0,
+        stock_quantity: (() => {
+          const n = Number.parseInt(String(v.stock_quantity), 10);
+          return Number.isFinite(n) && n >= 0 ? n : 0;
+        })(),
+      }));
+
     const payload: Record<string, unknown> = {
       name: name.trim(),
       description: description.trim() === "" ? null : description.trim(),
@@ -170,6 +212,7 @@ export default function AdminProductsPage() {
         category_id === ""
           ? null
           : Number.parseInt(category_id, 10),
+      variants: variantsPayload,
     };
 
     setIsSubmitting(true);
@@ -358,6 +401,125 @@ export default function AdminProductsPage() {
                 }}
                 className="w-full text-sm text-zinc-400 file:mr-3 file:rounded-md file:border file:border-zinc-700 file:bg-zinc-900 file:px-3 file:py-2 file:text-xs file:font-medium file:text-zinc-200"
               />
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-500">
+                Product variants (optional)
+              </h3>
+              <button
+                type="button"
+                onClick={() =>
+                  setVariants((prev) => [
+                    ...prev,
+                    { name: "", price_adjustment: 0, stock_quantity: 0 },
+                  ])
+                }
+                className="inline-flex items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-800"
+              >
+                <Plus className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+                Add variant
+              </button>
+            </div>
+            <div className="space-y-3 rounded-md border border-zinc-800 bg-zinc-950/50 p-4">
+              {variants.length === 0 ? (
+                <p className="text-xs text-zinc-600">
+                  No variants. Add rows for options like size or configuration; stock
+                  and price adjustment apply per variant at checkout.
+                </p>
+              ) : (
+                variants.map((row, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col gap-3 rounded-md border border-zinc-800/80 bg-zinc-900/40 p-3 sm:flex-row sm:flex-wrap sm:items-end"
+                  >
+                    <div className="min-w-0 flex-1 sm:min-w-[140px]">
+                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Size: L"
+                        value={row.name}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setVariants((prev) =>
+                            prev.map((r, i) =>
+                              i === index ? { ...r, name: v } : r,
+                            ),
+                          );
+                        }}
+                        className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                      />
+                    </div>
+                    <div className="w-full sm:w-28">
+                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                        Price ±
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={row.price_adjustment}
+                        onChange={(e) => {
+                          const n = Number.parseFloat(e.target.value);
+                          setVariants((prev) =>
+                            prev.map((r, i) =>
+                              i === index
+                                ? {
+                                    ...r,
+                                    price_adjustment: Number.isFinite(n)
+                                      ? n
+                                      : 0,
+                                  }
+                                : r,
+                            ),
+                          );
+                        }}
+                        className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                      />
+                    </div>
+                    <div className="w-full sm:w-24">
+                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                        Stock
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={row.stock_quantity}
+                        onChange={(e) => {
+                          const n = Number.parseInt(e.target.value, 10);
+                          setVariants((prev) =>
+                            prev.map((r, i) =>
+                              i === index
+                                ? {
+                                    ...r,
+                                    stock_quantity: Number.isFinite(n)
+                                      ? Math.max(0, n)
+                                      : 0,
+                                  }
+                                : r,
+                            ),
+                          );
+                        }}
+                        className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setVariants((prev) => prev.filter((_, i) => i !== index))
+                      }
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-zinc-800 text-zinc-500 transition hover:border-red-900/50 hover:bg-red-950/30 hover:text-red-400"
+                      aria-label="Remove variant"
+                    >
+                      <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3 md:col-span-2">

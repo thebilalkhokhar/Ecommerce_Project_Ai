@@ -19,6 +19,10 @@ function formatMoney(value: number): string {
   }).format(value);
 }
 
+function cartLineKey(line: CartItem): string {
+  return `${line.product.id}::${line.product.variant_name ?? ""}`;
+}
+
 export default function CartPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -56,10 +60,20 @@ export default function CartPage() {
     const toastId = toast.loading("Placing your order…");
     try {
       const payload = {
-        items: items.map((item: CartItem) => ({
-          product_id: item.product.id,
-          quantity: item.quantity,
-        })),
+        items: items.map((item: CartItem) => {
+          const row: {
+            product_id: number;
+            quantity: number;
+            variant_name?: string;
+          } = {
+            product_id: item.product.id,
+            quantity: item.quantity,
+          };
+          if (item.product.variant_name) {
+            row.variant_name = item.product.variant_name;
+          }
+          return row;
+        }),
       };
       await api.post("/orders", payload);
       toast.success("Order placed successfully!", { id: toastId });
@@ -116,11 +130,18 @@ export default function CartPage() {
             <ul className="divide-y divide-zinc-800 rounded-lg border border-zinc-800 bg-zinc-950">
               {items.map((line) => (
                 <li
-                  key={line.product.id}
+                  key={cartLineKey(line)}
                   className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-zinc-50">{line.product.name}</p>
+                    {line.product.variant_name ? (
+                      <p className="mt-2">
+                        <span className="inline-block rounded bg-zinc-900 px-2 py-1 text-xs text-zinc-400">
+                          {line.product.variant_name}
+                        </span>
+                      </p>
+                    ) : null}
                     <p className="mt-1 text-sm tabular-nums text-zinc-400">
                       {formatMoney(line.product.price)} each
                     </p>
@@ -132,7 +153,11 @@ export default function CartPage() {
                         type="button"
                         aria-label="Decrease quantity"
                         onClick={() =>
-                          updateQuantity(line.product.id, line.quantity - 1)
+                          updateQuantity(
+                            line.product.id,
+                            line.quantity - 1,
+                            line.product.variant_name,
+                          )
                         }
                         className="p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50"
                       >
@@ -145,7 +170,11 @@ export default function CartPage() {
                         type="button"
                         aria-label="Increase quantity"
                         onClick={() =>
-                          updateQuantity(line.product.id, line.quantity + 1)
+                          updateQuantity(
+                            line.product.id,
+                            line.quantity + 1,
+                            line.product.variant_name,
+                          )
                         }
                         className="p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50"
                       >
@@ -157,8 +186,16 @@ export default function CartPage() {
                       type="button"
                       aria-label={`Remove ${line.product.name}`}
                       onClick={() => {
-                        removeItem(line.product.id);
-                        toast.success(`${line.product.name} removed from cart`);
+                        removeItem(
+                          line.product.id,
+                          line.product.variant_name,
+                        );
+                        const v = line.product.variant_name;
+                        toast.success(
+                          v
+                            ? `${line.product.name} (${v}) removed from cart`
+                            : `${line.product.name} removed from cart`,
+                        );
                       }}
                       className="rounded-md border border-zinc-800 p-2 text-zinc-500 transition hover:border-red-900/50 hover:bg-red-950/20 hover:text-red-200"
                     >
