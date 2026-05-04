@@ -9,6 +9,7 @@ import api, { TOKEN_KEY } from "@/lib/axios";
 import { useAuthStore, type AuthUser } from "@/store/authStore";
 
 const ADMIN_LINKS = [
+  { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/categories", label: "Categories" },
