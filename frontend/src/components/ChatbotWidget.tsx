@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, X } from "lucide-react";
+import { Bot, Send, X } from "lucide-react";
 import api from "@/lib/axios";
 
 type ChatRole = "user" | "bot";
@@ -77,7 +77,7 @@ export function ChatbotWidget() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-0 right-0 z-50 p-4 sm:p-5">
+    <div className="pointer-events-none fixed bottom-6 right-6 z-50">
       <div className="pointer-events-auto flex flex-col items-end gap-3">
         {isOpen && (
           <div
@@ -165,11 +165,19 @@ export function ChatbotWidget() {
         <button
           type="button"
           onClick={() => setIsOpen((o) => !o)}
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900 text-zinc-50 transition hover:border-zinc-700 hover:bg-zinc-800"
+          className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-950 shadow-xl transition-transform duration-300 hover:scale-110 hover:shadow-zinc-500/20"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close assistant" : "Open assistant"}
         >
-          <MessageCircle className="h-6 w-6" strokeWidth={1.5} />
+          <span className="absolute right-0 top-0 flex h-3.5 w-3.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400 opacity-75" />
+            <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-zinc-100 bg-zinc-300" />
+          </span>
+          <Bot
+            className="h-6 w-6 group-hover:animate-pulse"
+            strokeWidth={1.5}
+            aria-hidden
+          />
         </button>
       </div>
     </div>

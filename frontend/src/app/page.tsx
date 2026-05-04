@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 
 const HERO_IMAGE =
@@ -114,18 +115,22 @@ export default async function Home() {
           <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
             Browse by category
           </h2>
-          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             {categories.length > 0 ? (
               categories.map((c) => (
                 <li key={c.id}>
                   <Link
-                    href={`/products?category_id=${c.id}`}
-                    className="flex min-h-[100px] flex-col justify-end rounded-lg border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+                    href={`/categories/${c.id}`}
+                    className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 shadow-sm transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-800/60"
                   >
-                    <span className="text-sm font-medium text-zinc-100">
+                    <span className="text-lg font-semibold text-zinc-100">
                       {c.name}
                     </span>
-                    <span className="mt-1 text-xs text-zinc-500">View products</span>
+                    <ArrowRight
+                      className="absolute bottom-6 right-6 h-5 w-5 text-zinc-400 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 group-hover:text-zinc-100"
+                      aria-hidden
+                      strokeWidth={1.75}
+                    />
                   </Link>
                 </li>
               ))
@@ -134,15 +139,17 @@ export default async function Home() {
                 {[1, 2, 3, 4].map((i) => (
                   <li key={i}>
                     <Link
-                      href="/products"
-                      className="flex min-h-[100px] flex-col justify-end rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-5 transition-colors hover:border-zinc-700"
+                      href="/categories"
+                      className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/20 p-6 shadow-sm transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-800/40"
                     >
-                      <span className="text-sm font-medium text-zinc-400">
+                      <span className="text-lg font-semibold text-zinc-400">
                         Discover
                       </span>
-                      <span className="mt-1 text-xs text-zinc-600">
-                        Explore the catalog
-                      </span>
+                      <ArrowRight
+                        className="absolute bottom-6 right-6 h-5 w-5 text-zinc-500 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-70 group-hover:text-zinc-300"
+                        aria-hidden
+                        strokeWidth={1.75}
+                      />
                     </Link>
                   </li>
                 ))}
