@@ -1,14 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import api from "@/lib/axios";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore, type CartItem } from "@/store/cartStore";
-import { useState } from "react";
 
 function formatMoney(value: number): string {
   return new Intl.NumberFormat("en-PK", {
@@ -24,77 +20,15 @@ function cartLineKey(line: CartItem): string {
 }
 
 export default function CartPage() {
-  const router = useRouter();
   const items = useCartStore((s) => s.items);
   const totalPrice = useCartStore((s) => s.totalPrice);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
-  const clearCart = useCartStore((s) => s.clearCart);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-
-  const [submitting, setSubmitting] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
 
   const subtotal = totalPrice;
   const shippingLabel = "Free";
   const orderTotal = subtotal;
-
-  async function handleCheckout() {
-    useAuthStore.getState().initAuth();
-    setCheckoutError("");
-
-    if (!useAuthStore.getState().isAuthenticated) {
-      toast.error("Please sign in to place your order.");
-      router.push("/login?next=/cart&reason=checkout");
-      return;
-    }
-
-    if (items.length === 0) {
-      const msg = "Your cart is empty.";
-      setCheckoutError(msg);
-      toast.error(msg);
-      return;
-    }
-
-    setSubmitting(true);
-    const toastId = toast.loading("Placing your order…");
-    try {
-      const payload = {
-        items: items.map((item: CartItem) => {
-          const row: {
-            product_id: number;
-            quantity: number;
-            variant_name?: string;
-          } = {
-            product_id: item.product.id,
-            quantity: item.quantity,
-          };
-          if (item.product.variant_name) {
-            row.variant_name = item.product.variant_name;
-          }
-          return row;
-        }),
-      };
-      await api.post("/orders", payload);
-      toast.success("Order placed successfully!", { id: toastId });
-      clearCart();
-      router.push("/orders?placed=1");
-    } catch (err: unknown) {
-      let msg = "Could not complete order. Try again.";
-      if (axios.isAxiosError(err)) {
-        const detail = err.response?.data?.detail;
-        if (typeof detail === "string") {
-          msg = detail;
-        }
-      } else {
-        msg = "Network error. Is the API running?";
-      }
-      toast.error(msg, { id: toastId });
-      setCheckoutError(msg);
-    } finally {
-      setSubmitting(false);
-    }
-  }
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
@@ -102,17 +36,8 @@ export default function CartPage() {
         Cart
       </h1>
       <p className="mt-1 text-sm text-zinc-500">
-        Cash on delivery — totals are confirmed at checkout.
+        Adjust quantities, then continue to checkout to pay.
       </p>
-
-      {checkoutError && (
-        <p
-          className="mt-6 rounded-md border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-200"
-          role="alert"
-        >
-          {checkoutError}
-        </p>
-      )}
 
       <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -230,20 +155,25 @@ export default function CartPage() {
               </div>
             </dl>
 
-            <button
-              type="button"
-              disabled={submitting || items.length === 0}
-              onClick={handleCheckout}
-              className="mt-6 w-full rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {submitting
-                ? "Placing order…"
-                : "Place order (Cash on Delivery)"}
-            </button>
+            {items.length === 0 ? (
+              <span
+                className="mt-6 block w-full cursor-not-allowed rounded-md border border-zinc-800 bg-zinc-900 py-3 text-center text-sm font-medium text-zinc-600 opacity-50"
+                aria-disabled
+              >
+                Proceed to checkout
+              </span>
+            ) : (
+              <Link
+                href="/checkout"
+                className="mt-6 px-10 block w-full rounded-md border border-zinc-700 bg-zinc-50 py-3 text-center text-sm font-medium text-zinc-950 transition hover:bg-white"
+              >
+                Proceed to checkout
+              </Link>
+            )}
 
             {!isAuthenticated && items.length > 0 && (
               <p className="mt-3 text-center text-xs text-zinc-500">
-                You&apos;ll be asked to sign in when you place the order.
+                You&apos;ll sign in at checkout if needed.
               </p>
             )}
           </div>
