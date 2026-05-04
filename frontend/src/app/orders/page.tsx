@@ -12,6 +12,8 @@ type OrderItemOut = {
   product_id: number;
   quantity: number;
   unit_price: string | number;
+  product_name?: string | null;
+  variant_name?: string | null;
 };
 
 type OrderOut = {
@@ -31,6 +33,15 @@ function formatMoney(value: string | number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(Number.isFinite(n) ? n : 0);
+}
+
+function itemLineTotal(it: OrderItemOut): number {
+  const unit =
+    typeof it.unit_price === "number"
+      ? it.unit_price
+      : Number.parseFloat(String(it.unit_price));
+  const u = Number.isFinite(unit) ? unit : 0;
+  return u * it.quantity;
 }
 
 function OrdersContent() {
@@ -137,35 +148,60 @@ function OrdersContent() {
       )}
 
       {isAuthenticated && !loading && orders.length > 0 && (
-        <ul className="mt-8 space-y-4">
+        <ul className="mx-auto mt-8 grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
           {orders.map((order) => (
             <li
               key={order.id}
-              className="rounded-lg border border-zinc-800 bg-zinc-950 p-5"
+              className="flex h-full w-full flex-col gap-4 rounded-lg border border-zinc-800 bg-zinc-950 p-6"
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm font-medium text-zinc-300">
+              <div className="mb-2 flex items-start justify-between">
+                <span className="text-sm font-semibold text-zinc-100">
                   Order #{order.id}
                 </span>
-                <span className="text-xs uppercase tracking-wide text-zinc-500">
+                <span className="text-xs uppercase tracking-wider text-zinc-400">
                   {order.status} · COD
                 </span>
               </div>
-              <p className="mt-2 text-lg font-semibold tabular-nums text-zinc-50">
-                {formatMoney(order.total_price)}
-              </p>
-              <ul className="mt-4 space-y-1 border-t border-zinc-800 pt-4 text-sm text-zinc-400">
-                {order.items.map((it) => (
-                  <li key={it.id}>
-                    Product #{it.product_id} × {it.quantity} @{" "}
-                    {formatMoney(it.unit_price)}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-zinc-800 pt-4">
+
+              <div className="flex flex-1 flex-col border-t border-zinc-800">
+                <div className="flex flex-col gap-2 py-2">
+                  {order.items.map((it) => {
+                    const label =
+                      it.product_name?.trim() || `Product #${it.product_id}`;
+                    return (
+                      <div
+                        key={it.id}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <div className="min-w-0 flex-1 pr-3">
+                          <div className="text-zinc-300">
+                            {label}
+                            <span className="ml-1 text-zinc-500">
+                              × {it.quantity}
+                            </span>
+                          </div>
+                          {it.variant_name ? (
+                            <p className="mt-0.5 text-xs text-zinc-500">
+                              {it.variant_name}
+                            </p>
+                          ) : null}
+                        </div>
+                        <span className="shrink-0 tabular-nums text-zinc-400">
+                          {formatMoney(itemLineTotal(it))}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-zinc-800 flex justify-between items-center">
+                <p className="text-sm font-medium tabular-nums text-zinc-100">
+                  Total: {formatMoney(order.total_price)}
+                </p>
                 <Link
                   href={`/orders/${order.id}/receipt`}
-                  className="inline-flex items-center rounded-md border border-zinc-600 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-400 hover:bg-zinc-900 hover:text-zinc-50"
+                  className="inline-flex items-center rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
                 >
                   Receipt 🧾
                 </Link>
