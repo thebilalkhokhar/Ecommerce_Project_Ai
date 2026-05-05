@@ -18,3 +18,4 @@ langchain-groq
 resend
 faker
 stripe
+requests>=2.31.0

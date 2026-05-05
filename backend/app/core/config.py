@@ -39,5 +39,11 @@ class Settings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: str = ""
     FRONTEND_BASE_URL: str = "http://localhost:3000"
 
+    PAYFLOW_PARTNER: str = ""
+    PAYFLOW_VENDOR: str = ""
+    PAYFLOW_USER: str = ""
+    PAYFLOW_PASSWORD: str = ""
+    PAYFLOW_URL: str = "https://pilot-payflowpro.paypal.com"
+
 
 settings = Settings()

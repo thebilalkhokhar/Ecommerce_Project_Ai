@@ -1,4 +1,4 @@
-"""Stripe Checkout Session creation and webhooks."""
+"""Payment integrations: Stripe Checkout, PayPal Payflow Pro, and webhooks."""
 
 from __future__ import annotations
 
@@ -14,6 +14,8 @@ from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.models.order import Order, PaymentStatus
 from app.models.user import User
+from app.schemas.payment import CreditCardPaymentInput
+from app.services import payflow_service
 from app.services.crud import crud_order
 
 import app.services.stripe_service  # noqa: F401
@@ -25,6 +27,11 @@ router = APIRouter()
 
 class CheckoutSessionResponse(BaseModel):
     url: str
+
+
+class PayflowCheckoutOut(BaseModel):
+    success: bool = True
+    message: str = "Payment processed successfully"
 
 
 def _unit_amount_pkr(unit_price: Decimal) -> int:
@@ -119,6 +126,80 @@ def create_checkout_session(
             detail="Stripe did not return a checkout URL",
         )
     return CheckoutSessionResponse(url=checkout_url)
+
+
+@router.post(
+    "/payflow-checkout/{order_id}",
+    response_model=PayflowCheckoutOut,
+)
+def payflow_checkout(
+    order_id: int,
+    body: CreditCardPaymentInput,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PayflowCheckoutOut:
+    order = crud_order.get_order_by_id(db, order_id)
+    if order is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+    if order.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized for this order",
+        )
+    if order.is_cod:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This order is cash on delivery. Use Payflow only for card checkout orders.",
+        )
+    if order.payment_status != PaymentStatus.unpaid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order already paid",
+        )
+
+    try:
+        payflow_service.process_payflow_transaction(
+            order_id,
+            float(order.total_price),
+            body,
+        )
+    except HTTPException:
+        db.rollback()
+        crud_order.delete_unpaid_online_order_restore_stock(
+            db,
+            order_id,
+            current_user.id,
+        )
+        raise
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Payflow error for order %s", order_id)
+        try:
+            crud_order.delete_unpaid_online_order_restore_stock(
+                db,
+                order_id,
+                current_user.id,
+            )
+        except Exception:
+            logger.exception(
+                "Could not restore stock / delete order %s after Payflow failure",
+                order_id,
+            )
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Payment could not be completed",
+        ) from exc
+
+    row = db.get(Order, order_id)
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Order not found after payment",
+        )
+    row.payment_status = PaymentStatus.paid
+    db.add(row)
+    db.commit()
+    return PayflowCheckoutOut()
 
 
 @router.post("/webhook")

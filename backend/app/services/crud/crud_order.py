@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models.order import Order, OrderStatus
+from app.models.order import Order, OrderStatus, PaymentStatus
 from app.models.order_item import OrderItem
 from app.models.product import ProductVariant
 from app.models.user import User
@@ -196,3 +196,45 @@ def update_order_status(db: Session, order_id: int, new_status: OrderStatus) -> 
         )
     )
     return db.scalars(stmt).one()
+
+
+def delete_unpaid_online_order_restore_stock(
+    db: Session,
+    order_id: int,
+    user_id: int,
+) -> None:
+    """Delete a non-COD order that is still unpaid and restore product/variant stock."""
+    order = get_order_by_id(db, order_id)
+    if order is None:
+        return
+    if order.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized for this order",
+        )
+    if order.is_cod:
+        return
+    if order.payment_status == PaymentStatus.paid:
+        return
+
+    for it in order.items:
+        product = crud_product.get_product_by_id(db, it.product_id)
+        if product is None:
+            continue
+        if it.variant_name and it.variant_name.strip():
+            vname = it.variant_name.strip()
+            variant = db.scalars(
+                select(ProductVariant).where(
+                    ProductVariant.product_id == product.id,
+                    ProductVariant.name == vname,
+                ),
+            ).first()
+            if variant is not None:
+                variant.stock_quantity += it.quantity
+                db.add(variant)
+        else:
+            product.stock_quantity += it.quantity
+            db.add(product)
+
+    db.delete(order)
+    db.commit()

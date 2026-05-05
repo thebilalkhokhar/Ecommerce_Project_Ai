@@ -18,6 +18,24 @@ function formatMoney(value: number): string {
   }).format(value);
 }
 
+function apiErrorMessage(err: unknown): string {
+  if (!axios.isAxiosError(err)) {
+    return "Network error. Is the API running?";
+  }
+  const detail = err.response?.data?.detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    const parts = detail.map((item: unknown) => {
+      if (item && typeof item === "object" && "msg" in item) {
+        return String((item as { msg: string }).msg);
+      }
+      return JSON.stringify(item);
+    });
+    if (parts.length) return parts.join(" ");
+  }
+  return "Could not complete request. Try again.";
+}
+
 type OrderCreatedResponse = {
   id: number;
   total_price?: string | number;
@@ -36,7 +54,13 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe" | "payflow">(
+    "cod",
+  );
+
+  const [payflowCard, setPayflowCard] = useState("");
+  const [payflowExpiry, setPayflowExpiry] = useState("");
+  const [payflowCvv, setPayflowCvv] = useState("");
 
   const subtotal = totalPrice;
   const shippingLabel = "Free";
@@ -61,6 +85,26 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
     const toastId = toast.loading("Placing your order…");
+
+    let payflowBody: {
+      card_number: string;
+      expiry_date: string;
+      cvv: string;
+    } | null = null;
+    if (paymentMethod === "payflow") {
+      const card_number = payflowCard.replace(/\s+/g, "");
+      const expiry_date = payflowExpiry.trim();
+      const cvv = payflowCvv.trim();
+      if (!card_number || expiry_date.length !== 4 || !cvv) {
+        const msg = "Enter card number, expiry as MMYY, and CVV.";
+        toast.error(msg, { id: toastId });
+        setCheckoutError(msg);
+        setSubmitting(false);
+        return;
+      }
+      payflowBody = { card_number, expiry_date, cvv };
+    }
+
     try {
       const payload = {
         items: items.map((item: CartItem) => {
@@ -98,25 +142,31 @@ export default function CheckoutPage() {
         return;
       }
 
+      if (paymentMethod === "payflow" && payflowBody) {
+        toast.loading("Processing card payment…", { id: toastId });
+        await api.post(`/payments/payflow-checkout/${order.id}`, payflowBody);
+        toast.success("Payment successful!", { id: toastId });
+        clearCart();
+        setPayflowCard("");
+        setPayflowExpiry("");
+        setPayflowCvv("");
+        router.push(`/orders/${order.id}?success=true`);
+        return;
+      }
+
       toast.success("Order placed successfully!", { id: toastId });
       clearCart();
       router.push("/orders?placed=1");
     } catch (err: unknown) {
-      let msg = "Could not complete order. Try again.";
-      if (axios.isAxiosError(err)) {
-        const detail = err.response?.data?.detail;
-        if (typeof detail === "string") {
-          msg = detail;
-        }
-      } else {
-        msg = "Network error. Is the API running?";
-      }
+      const msg = apiErrorMessage(err);
       toast.error(msg, { id: toastId });
       setCheckoutError(msg);
     } finally {
       setSubmitting(false);
     }
   }
+
+  const payflowSelected = paymentMethod === "payflow";
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
@@ -252,22 +302,117 @@ export default function CheckoutPage() {
                       </span>
                     </span>
                   </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="payflow"
+                      checked={paymentMethod === "payflow"}
+                      onChange={() => setPaymentMethod("payflow")}
+                      className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-zinc-50">
+                        Credit Card (Payflow)
+                      </span>
+                      <span className="mt-0.5 block text-xs text-zinc-400">
+                        PayPal Payflow Pro — card processed on our servers.
+                      </span>
+                    </span>
+                  </label>
                 </div>
+
+                {payflowSelected && (
+                  <div className="mt-5 space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
+                    <p className="text-xs text-zinc-500">
+                      Enter your card details exactly as shown on the card. Expiry as
+                      MMYY (e.g. 1226).
+                    </p>
+                    <div>
+                      <label
+                        htmlFor="payflow-card"
+                        className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                      >
+                        Card number
+                      </label>
+                      <input
+                        id="payflow-card"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        maxLength={23}
+                        value={payflowCard}
+                        onChange={(e) => setPayflowCard(e.target.value)}
+                        className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                        placeholder="0000 0000 0000 0000"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label
+                          htmlFor="payflow-exp"
+                          className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                        >
+                          Expiry (MMYY)
+                        </label>
+                        <input
+                          id="payflow-exp"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="cc-exp"
+                          maxLength={4}
+                          value={payflowExpiry}
+                          onChange={(e) =>
+                            setPayflowExpiry(e.target.value.replace(/\D/g, "").slice(0, 4))
+                          }
+                          className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                          placeholder="MMYY"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="payflow-cvv"
+                          className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                        >
+                          CVV
+                        </label>
+                        <input
+                          id="payflow-cvv"
+                          type="password"
+                          inputMode="numeric"
+                          autoComplete="cc-csc"
+                          maxLength={4}
+                          value={payflowCvv}
+                          onChange={(e) =>
+                            setPayflowCvv(e.target.value.replace(/\D/g, "").slice(0, 4))
+                          }
+                          className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                          placeholder="•••"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
                 type="button"
                 disabled={submitting || items.length === 0}
-                onClick={handlePlaceOrder}
+                onClick={() => void handlePlaceOrder()}
                 className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {submitting
                   ? paymentMethod === "stripe"
                     ? "Redirecting…"
-                    : "Placing order…"
+                    : paymentMethod === "payflow"
+                      ? "Processing…"
+                      : "Placing order…"
                   : paymentMethod === "stripe"
                     ? "Continue to payment"
-                    : "Place order"}
+                    : paymentMethod === "payflow"
+                      ? "Pay with card"
+                      : "Place order"}
               </button>
 
               {!isAuthenticated && items.length > 0 && (
