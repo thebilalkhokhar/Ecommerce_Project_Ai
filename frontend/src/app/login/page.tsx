@@ -3,12 +3,12 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
 import { useAuthStore } from "@/store/authStore";
 import { FacebookLoginButton } from "@/components/FacebookLoginButton";
+import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 
 type TokenResponse = {
   access_token: string;
@@ -216,22 +216,23 @@ function LoginForm() {
             <div className="flex w-full flex-col gap-3">
               {hasGoogleOAuth && (
                 <div
-                  className={`flex min-h-[44px] w-full justify-center [&>div]:w-full ${googleSubmitting || facebookSubmitting ? "pointer-events-none opacity-50" : ""}`}
+                  className={
+                    googleSubmitting || facebookSubmitting
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
                 >
-                  <GoogleLogin
-                    onSuccess={(cred) => {
-                      if (cred.credential) {
-                        void handleGoogleCredential(cred.credential);
-                      }
+                  <GoogleLoginButton
+                    disabled={
+                      submitting || googleSubmitting || facebookSubmitting
+                    }
+                    text="continue_with"
+                    onCredential={(credential) => {
+                      void handleGoogleCredential(credential);
                     }}
                     onError={() => {
                       toast.error("Google sign-in was cancelled or failed.");
                     }}
-                    theme="filled_black"
-                    size="large"
-                    width="320"
-                    text="continue_with"
-                    shape="rectangular"
                   />
                 </div>
               )}
