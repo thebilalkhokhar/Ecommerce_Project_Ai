@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Token(BaseModel):
@@ -19,3 +19,9 @@ class RefreshRequest(BaseModel):
 class TokenPayload(BaseModel):
     sub: str | None = None
     exp: int | None = None
+
+
+class GoogleLoginRequest(BaseModel):
+    """Google Sign-In credential (JWT) from the frontend."""
+
+    credential: str = Field(..., min_length=20)

@@ -1,14 +1,17 @@
 from datetime import datetime, timezone
+import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
+from google.auth.transport import requests as google_auth_requests
+from google.oauth2 import id_token
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.core import security
 from app.core.config import settings
-from app.schemas.token import AccessTokenResponse, RefreshRequest, Token
+from app.schemas.token import AccessTokenResponse, GoogleLoginRequest, RefreshRequest, Token
 from app.schemas.user import UserCreate, UserOut
 from app.services.crud import crud_refresh_token, crud_user
 
@@ -48,6 +51,82 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
     if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user",
+        )
+
+    access_token = security.create_access_token({"sub": str(user.id)})
+    refresh_token = security.create_refresh_token({"sub": str(user.id)})
+    client_host = request.client.host if request.client else None
+    crud_refresh_token.create_refresh_token_record(
+        db,
+        user_id=user.id,
+        token=refresh_token,
+        device_info=request.headers.get("user-agent"),
+        ip_address=client_host,
+    )
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
+
+
+@router.post("/google-login", response_model=Token)
+def google_login(
+    request: Request,
+    body: GoogleLoginRequest,
+    db: Session = Depends(get_db),
+) -> Token:
+    if not settings.GOOGLE_CLIENT_ID.strip():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google OAuth is not configured",
+        )
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            body.credential,
+            google_auth_requests.Request(),
+            settings.GOOGLE_CLIENT_ID,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google credential",
+        ) from exc
+
+    if idinfo.get("email_verified") is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google email is not verified",
+        )
+
+    raw_email = idinfo.get("email")
+    if not raw_email or not isinstance(raw_email, str):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google account has no email",
+        )
+    email = raw_email.strip().lower()
+    full_name = (
+        idinfo.get("name")
+        or idinfo.get("given_name")
+        or idinfo.get("family_name")
+        or "User"
+    )
+    if not isinstance(full_name, str):
+        full_name = "User"
+
+    user = crud_user.get_user_by_email(db, email)
+    if user is None:
+        random_password = secrets.token_urlsafe(48)
+        user = crud_user.create_google_user(
+            db,
+            email=email,
+            full_name=full_name.strip() or "User",
+            password=random_password,
+        )
+    elif not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive user",

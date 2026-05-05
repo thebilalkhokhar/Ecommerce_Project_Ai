@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
@@ -14,11 +15,16 @@ type TokenResponse = {
   token_type: string;
 };
 
+const hasGoogleOAuth =
+  typeof process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID === "string" &&
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID.length > 0;
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((s) => s.login);
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const checkoutHint = searchParams.get("reason") === "checkout";
@@ -27,6 +33,31 @@ function LoginForm() {
     rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
       ? rawNext
       : "/products";
+
+  async function handleGoogleCredential(credential: string) {
+    setError("");
+    setGoogleSubmitting(true);
+    try {
+      const { data } = await api.post<TokenResponse>("/auth/google-login", {
+        credential,
+      });
+      login(data.access_token);
+      toast.success("Signed in with Google.");
+      router.push(nextPath.startsWith("/") ? nextPath : "/products");
+    } catch (err: unknown) {
+      let msg = "Google sign-in failed.";
+      if (axios.isAxiosError(err)) {
+        const detail = err.response?.data?.detail;
+        if (typeof detail === "string") {
+          msg = detail;
+        }
+      }
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setGoogleSubmitting(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -130,12 +161,48 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || googleSubmitting}
             className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-2.5 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:opacity-50"
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        {hasGoogleOAuth && (
+          <>
+            <div className="relative my-6">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden
+              >
+                <div className="w-full border-t border-zinc-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase tracking-wider">
+                <span className="bg-zinc-950 px-3 text-zinc-500">Or</span>
+              </div>
+            </div>
+
+            <div
+              className={`flex min-h-[44px] w-full justify-center [&>div]:w-full ${googleSubmitting ? "pointer-events-none opacity-50" : ""}`}
+            >
+              <GoogleLogin
+                onSuccess={(cred) => {
+                  if (cred.credential) {
+                    void handleGoogleCredential(cred.credential);
+                  }
+                }}
+                onError={() => {
+                  toast.error("Google sign-in was cancelled or failed.");
+                }}
+                theme="filled_black"
+                size="large"
+                width="320"
+                text="continue_with"
+                shape="rectangular"
+              />
+            </div>
+          </>
+        )}
 
         <p className="mt-6 text-center text-sm text-zinc-500">
           No account?{" "}

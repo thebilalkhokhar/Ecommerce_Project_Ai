@@ -5,10 +5,38 @@ from app.core.security import get_password_hash
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
+_GOOGLE_OAUTH_PLACEHOLDER_PHONE = "+923001000100"
+
 
 def get_user_by_email(db: Session, email: str) -> User | None:
     normalized = email.strip().lower()
     return db.scalar(select(User).where(User.email == normalized))
+
+
+def create_google_user(
+    db: Session,
+    *,
+    email: str,
+    full_name: str,
+    password: str,
+) -> User:
+    """Register user from Google without UserCreate (skips form phone validation)."""
+    user = User(
+        email=email.strip().lower(),
+        hashed_password=get_password_hash(password),
+        full_name=full_name.strip() or "User",
+        phone_number=_GOOGLE_OAUTH_PLACEHOLDER_PHONE,
+        address_line_1="—",
+        address_line_2=None,
+        city="—",
+        state="—",
+        postal_code="00000",
+        is_admin=False,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 def create_user(db: Session, user_in: UserCreate) -> User:

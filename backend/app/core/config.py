@@ -15,6 +15,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         populate_by_name=True,
+        # Empty GOOGLE_CLIENT_ID in the shell/OS must not override a real value from .env
+        env_ignore_empty=True,
     )
 
     DATABASE_URL: str
@@ -44,6 +46,8 @@ class Settings(BaseSettings):
     PAYFLOW_USER: str = ""
     PAYFLOW_PASSWORD: str = ""
     PAYFLOW_URL: str = "https://pilot-payflowpro.paypal.com"
+
+    GOOGLE_CLIENT_ID: str = ""
 
 
 settings = Settings()
