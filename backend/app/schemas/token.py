@@ -21,6 +21,12 @@ class TokenPayload(BaseModel):
     exp: int | None = None
 
 
+class FacebookLoginRequest(BaseModel):
+    """Facebook user access token from the JS SDK login response."""
+
+    access_token: str = Field(..., min_length=10)
+
+
 class GoogleLoginRequest(BaseModel):
     """Google Sign-In credential (JWT) from the frontend."""
 

@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
 import { useAuthStore } from "@/store/authStore";
+import { FacebookLoginButton } from "@/components/FacebookLoginButton";
 
 type TokenResponse = {
   access_token: string;
@@ -19,12 +20,17 @@ const hasGoogleOAuth =
   typeof process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID === "string" &&
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID.length > 0;
 
+const hasFacebookOAuth =
+  typeof process.env.NEXT_PUBLIC_FACEBOOK_APP_ID === "string" &&
+  process.env.NEXT_PUBLIC_FACEBOOK_APP_ID.length > 0;
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((s) => s.login);
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [facebookSubmitting, setFacebookSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const checkoutHint = searchParams.get("reason") === "checkout";
@@ -56,6 +62,31 @@ function LoginForm() {
       toast.error(msg);
     } finally {
       setGoogleSubmitting(false);
+    }
+  }
+
+  async function handleFacebookAccessToken(accessToken: string) {
+    setError("");
+    setFacebookSubmitting(true);
+    try {
+      const { data } = await api.post<TokenResponse>("/auth/facebook-login", {
+        access_token: accessToken,
+      });
+      login(data.access_token);
+      toast.success("Signed in with Facebook.");
+      router.push(nextPath.startsWith("/") ? nextPath : "/products");
+    } catch (err: unknown) {
+      let msg = "Facebook sign-in failed.";
+      if (axios.isAxiosError(err)) {
+        const detail = err.response?.data?.detail;
+        if (typeof detail === "string") {
+          msg = detail;
+        }
+      }
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setFacebookSubmitting(false);
     }
   }
 
@@ -161,14 +192,14 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={submitting || googleSubmitting}
+            disabled={submitting || googleSubmitting || facebookSubmitting}
             className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-2.5 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:opacity-50"
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        {hasGoogleOAuth && (
+        {(hasGoogleOAuth || hasFacebookOAuth) && (
           <>
             <div className="relative my-6">
               <div
@@ -182,24 +213,44 @@ function LoginForm() {
               </div>
             </div>
 
-            <div
-              className={`flex min-h-[44px] w-full justify-center [&>div]:w-full ${googleSubmitting ? "pointer-events-none opacity-50" : ""}`}
-            >
-              <GoogleLogin
-                onSuccess={(cred) => {
-                  if (cred.credential) {
-                    void handleGoogleCredential(cred.credential);
+            <div className="flex w-full flex-col gap-3">
+              {hasGoogleOAuth && (
+                <div
+                  className={`flex min-h-[44px] w-full justify-center [&>div]:w-full ${googleSubmitting || facebookSubmitting ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <GoogleLogin
+                    onSuccess={(cred) => {
+                      if (cred.credential) {
+                        void handleGoogleCredential(cred.credential);
+                      }
+                    }}
+                    onError={() => {
+                      toast.error("Google sign-in was cancelled or failed.");
+                    }}
+                    theme="filled_black"
+                    size="large"
+                    width="320"
+                    text="continue_with"
+                    shape="rectangular"
+                  />
+                </div>
+              )}
+
+              {hasFacebookOAuth && (
+                <FacebookLoginButton
+                  disabled={
+                    googleSubmitting ||
+                    facebookSubmitting ||
+                    submitting
                   }
-                }}
-                onError={() => {
-                  toast.error("Google sign-in was cancelled or failed.");
-                }}
-                theme="filled_black"
-                size="large"
-                width="320"
-                text="continue_with"
-                shape="rectangular"
-              />
+                  onAccessToken={(token) => {
+                    void handleFacebookAccessToken(token);
+                  }}
+                  onError={() =>
+                    toast.error("Facebook sign-in was cancelled or failed.")
+                  }
+                />
+              )}
             </div>
           </>
         )}
