@@ -21,6 +21,7 @@ type OrderOut = {
   user_id: number;
   total_price: string | number;
   status: string;
+  payment_status: string;
   is_cod: boolean;
   items: OrderItemOut[];
 };
@@ -159,7 +160,8 @@ function OrdersContent() {
                   Order #{order.id}
                 </span>
                 <span className="text-xs uppercase tracking-wider text-zinc-400">
-                  {order.status} · COD
+                  {order.status} · {order.is_cod ? "COD" : "Card"} ·{" "}
+                  {order.payment_status === "paid" ? "Paid" : "Unpaid"}
                 </span>
               </div>
 
@@ -195,16 +197,24 @@ function OrdersContent() {
                 </div>
               </div>
 
-              <div className="mt-auto pt-4 border-t border-zinc-800 flex justify-between items-center">
+              <div className="mt-auto flex flex-col gap-3 border-t border-zinc-800 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-medium tabular-nums text-zinc-100">
                   Total: {formatMoney(order.total_price)}
                 </p>
-                <Link
-                  href={`/orders/${order.id}/receipt`}
-                  className="inline-flex items-center rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
-                >
-                  Receipt 🧾
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="inline-flex items-center rounded-md border border-zinc-600 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-900"
+                  >
+                    View order
+                  </Link>
+                  <Link
+                    href={`/orders/${order.id}/receipt`}
+                    className="inline-flex items-center rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
+                  >
+                    Receipt 🧾
+                  </Link>
+                </div>
               </div>
             </li>
           ))}

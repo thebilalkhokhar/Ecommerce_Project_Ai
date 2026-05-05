@@ -24,6 +24,11 @@ class OrderStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class PaymentStatus(str, enum.Enum):
+    unpaid = "unpaid"
+    paid = "paid"
+
+
 class Order(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
@@ -31,6 +36,11 @@ class Order(Base):
     status: Mapped[OrderStatus] = mapped_column(
         SQLEnum(OrderStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]),
         default=OrderStatus.pending,
+        nullable=False,
+    )
+    payment_status: Mapped[PaymentStatus] = mapped_column(
+        SQLEnum(PaymentStatus, native_enum=False, values_callable=lambda x: [e.value for e in x]),
+        default=PaymentStatus.unpaid,
         nullable=False,
     )
     is_cod: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

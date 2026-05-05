@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.order import OrderStatus
+from app.models.order import OrderStatus, PaymentStatus
 
 
 class OrderItemCreate(BaseModel):
@@ -14,6 +14,7 @@ class OrderItemCreate(BaseModel):
 
 class OrderCreate(BaseModel):
     items: list[OrderItemCreate] = Field(..., min_length=1)
+    is_cod: bool = True
 
 
 class OrderItemOut(BaseModel):
@@ -43,6 +44,7 @@ class OrderOut(BaseModel):
     user_id: int
     total_price: Decimal
     status: OrderStatus
+    payment_status: PaymentStatus
     is_cod: bool
     created_at: datetime | None = None
     user: OrderUserOut | None = None

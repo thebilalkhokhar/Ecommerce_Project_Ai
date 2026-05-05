@@ -69,7 +69,7 @@ def create_order(db: Session, user: User, order_in: OrderCreate) -> Order:
             user_id=user.id,
             total_price=calculated_total,
             status=OrderStatus.pending,
-            is_cod=True,
+            is_cod=order_in.is_cod,
         )
         db.add(order)
         db.flush()
@@ -155,6 +155,7 @@ def serialize_order_out(order: Order):
         user_id=order.user_id,
         total_price=order.total_price,
         status=order.status,
+        payment_status=order.payment_status,
         is_cod=order.is_cod,
         created_at=order.created_at,
         user=user_out,

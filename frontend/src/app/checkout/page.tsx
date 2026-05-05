@@ -18,6 +18,15 @@ function formatMoney(value: number): string {
   }).format(value);
 }
 
+type OrderCreatedResponse = {
+  id: number;
+  total_price?: string | number;
+  status?: string;
+  payment_status?: string;
+  is_cod?: boolean;
+  items?: unknown[];
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -27,6 +36,7 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe">("cod");
 
   const subtotal = totalPrice;
   const shippingLabel = "Free";
@@ -67,8 +77,27 @@ export default function CheckoutPage() {
           }
           return row;
         }),
+        is_cod: paymentMethod === "cod",
       };
-      await api.post("/orders", payload);
+      const { data: order } = await api.post<OrderCreatedResponse>(
+        "/orders",
+        payload,
+      );
+
+      if (paymentMethod === "stripe") {
+        toast.loading("Redirecting to secure checkout…", { id: toastId });
+        const { data: session } = await api.post<{ url: string }>(
+          `/payments/create-checkout-session/${order.id}`,
+          {},
+        );
+        if (!session?.url) {
+          throw new Error("No checkout URL returned");
+        }
+        clearCart();
+        window.location.href = session.url;
+        return;
+      }
+
       toast.success("Order placed successfully!", { id: toastId });
       clearCart();
       router.push("/orders?placed=1");
@@ -186,12 +215,13 @@ export default function CheckoutPage() {
                   Payment method
                 </h2>
                 <div className="flex flex-col gap-3">
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
                     <input
                       type="radio"
                       name="payment"
                       value="cod"
-                      defaultChecked
+                      checked={paymentMethod === "cod"}
+                      onChange={() => setPaymentMethod("cod")}
                       className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                     />
                     <span>
@@ -204,25 +234,24 @@ export default function CheckoutPage() {
                     </span>
                   </label>
 
-                  <div className="cursor-not-allowed rounded-lg border border-zinc-800 bg-zinc-900/30 p-4 opacity-50">
-                    <label className="flex items-start gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="card"
-                        disabled
-                        className="mt-1 h-4 w-4 shrink-0 cursor-not-allowed border-zinc-600 bg-zinc-900 opacity-60"
-                      />
-                      <span>
-                        <span className="block text-sm font-medium text-zinc-500">
-                          Card / Stripe (Coming soon)
-                        </span>
-                        <span className="mt-0.5 block text-xs text-zinc-600">
-                          Online payments will be available later.
-                        </span>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="stripe"
+                      checked={paymentMethod === "stripe"}
+                      onChange={() => setPaymentMethod("stripe")}
+                      className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-zinc-50">
+                        Credit / Debit Card (Stripe)
                       </span>
-                    </label>
-                  </div>
+                      <span className="mt-0.5 block text-xs text-zinc-400">
+                        Secure payment via Stripe Checkout.
+                      </span>
+                    </span>
+                  </label>
                 </div>
               </div>
 
@@ -232,7 +261,13 @@ export default function CheckoutPage() {
                 onClick={handlePlaceOrder}
                 className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {submitting ? "Placing order…" : "Place order"}
+                {submitting
+                  ? paymentMethod === "stripe"
+                    ? "Redirecting…"
+                    : "Placing order…"
+                  : paymentMethod === "stripe"
+                    ? "Continue to payment"
+                    : "Place order"}
               </button>
 
               {!isAuthenticated && items.length > 0 && (
