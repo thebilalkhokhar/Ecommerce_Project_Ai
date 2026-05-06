@@ -18,8 +18,8 @@ const ADMIN_LINKS = [
 function navLinkClass(active: boolean) {
   return `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
     active
-      ? "bg-zinc-800 text-zinc-50"
-      : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+      ? "bg-gray-200 text-textMain"
+      : "text-textMain/70 hover:bg-gray-50 hover:text-textMain"
   }`;
 }
 
@@ -87,13 +87,13 @@ export default function AdminLayout({
 
   if (!checked) {
     return (
-      <div className="flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-3 bg-zinc-950">
+      <div className="flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-3 bg-background">
         <Loader2
-          className="h-8 w-8 animate-spin text-zinc-500"
+          className="h-8 w-8 animate-spin text-textMain/60"
           strokeWidth={1.5}
           aria-hidden
         />
-        <p className="text-sm text-zinc-500">Checking access…</p>
+        <p className="text-sm text-textMain/60">Checking access…</p>
       </div>
     );
   }
@@ -103,13 +103,13 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-zinc-950 md:flex-row">
-      <aside className="hidden shrink-0 border-r border-zinc-800 bg-zinc-900 md:flex md:w-56 md:flex-col">
-        <div className="border-b border-zinc-800 px-4 py-5">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+    <div className="flex min-h-0 flex-1 flex-col bg-background md:flex-row">
+      <aside className="hidden shrink-0 border-r border-gray-200 bg-gray-50 md:flex md:w-56 md:flex-col">
+        <div className="border-b border-gray-200 px-4 py-5">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
             Admin
           </p>
-          <p className="mt-1 text-sm font-semibold text-zinc-100">Dashboard</p>
+          <p className="mt-1 text-sm font-semibold text-textMain">Dashboard</p>
         </div>
         <nav className="flex flex-col gap-0.5 p-3" aria-label="Admin sections">
           {ADMIN_LINKS.map(({ href, label }) => (
@@ -125,7 +125,7 @@ export default function AdminLayout({
       </aside>
 
       <nav
-        className="flex gap-1 overflow-x-auto border-b border-zinc-800 bg-zinc-900 px-3 py-2 md:hidden"
+        className="flex gap-1 overflow-x-auto border-b border-gray-200 bg-gray-50 px-3 py-2 md:hidden"
         aria-label="Admin sections"
       >
         {ADMIN_LINKS.map(({ href, label }) => (
@@ -134,8 +134,8 @@ export default function AdminLayout({
             href={href}
             className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
               pathname === href
-                ? "border-zinc-600 bg-zinc-800 text-zinc-50"
-                : "border-zinc-800 text-zinc-400"
+                ? "border-gray-300 bg-gray-200 text-textMain"
+                : "border-gray-200 text-textMain/70"
             }`}
           >
             {label}
@@ -143,7 +143,7 @@ export default function AdminLayout({
         ))}
       </nav>
 
-      <main className="min-w-0 flex-1 bg-zinc-950 p-4 md:p-8">{children}</main>
+      <main className="min-w-0 flex-1 bg-background p-4 md:p-8">{children}</main>
     </div>
   );
 }

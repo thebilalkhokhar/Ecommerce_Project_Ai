@@ -137,18 +137,18 @@ export default function RegisterPage() {
 
   return (
     <main className="mx-auto flex max-w-lg flex-1 flex-col justify-center px-4 py-16">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-50">
+      <div className="rounded-xl border border-gray-200 bg-surface p-8 shadow-md">
+        <h1 className="text-xl font-semibold tracking-tight text-textMain">
           Create account
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-textMain/70">
           Pakistani mobile format required (see hint below).
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {error && (
             <p
-              className="rounded-md border border-red-900/50 bg-red-950/30 px-3 py-2 text-sm text-red-200"
+              className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
               role="alert"
             >
               {error}
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               required
               autoComplete="name"
               placeholder="Full name"
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
           </div>
 
@@ -180,7 +180,7 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               placeholder="Email"
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
           </div>
 
@@ -195,7 +195,7 @@ export default function RegisterPage() {
               required
               autoComplete="new-password"
               placeholder="Password"
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
           </div>
 
@@ -209,11 +209,11 @@ export default function RegisterPage() {
               required
               autoComplete="tel"
               placeholder={PK_PHONE_PLACEHOLDER}
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
-            <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
+            <p className="mt-1.5 text-xs leading-relaxed text-textMain/70">
               Use a Pakistani mobile:{" "}
-              <span className="text-zinc-400">
+              <span className="text-textMain/80">
                 +92…, 03…, optional hyphens (e.g. 0313-4432915)
               </span>
             </p>
@@ -229,7 +229,7 @@ export default function RegisterPage() {
               required
               autoComplete="street-address"
               placeholder="Address line 1"
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
           </div>
 
@@ -244,7 +244,7 @@ export default function RegisterPage() {
                 required
                 autoComplete="address-level2"
                 placeholder="City"
-                className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
               />
             </div>
             <div>
@@ -257,7 +257,7 @@ export default function RegisterPage() {
                 required
                 autoComplete="address-level1"
                 placeholder="State"
-                className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
               />
             </div>
           </div>
@@ -272,14 +272,14 @@ export default function RegisterPage() {
               required
               autoComplete="postal-code"
               placeholder="Postal code"
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-white focus:outline-none focus:ring-0"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/45 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/25"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting || googleSubmitting || facebookSubmitting}
-            className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-2.5 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:opacity-50"
+            className="w-full rounded-md bg-primary py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
           >
             {submitting ? "Creating…" : "Register"}
           </button>
@@ -292,10 +292,10 @@ export default function RegisterPage() {
                 className="absolute inset-0 flex items-center"
                 aria-hidden
               >
-                <div className="w-full border-t border-zinc-800" />
+                <div className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase tracking-wider">
-                <span className="bg-zinc-950 px-3 text-zinc-500">Or</span>
+                <span className="bg-surface px-3 text-textMain/60">Or</span>
               </div>
             </div>
 
@@ -342,11 +342,11 @@ export default function RegisterPage() {
           </>
         )}
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-textMain/70">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-zinc-300 underline-offset-4 hover:text-zinc-50 hover:underline"
+            className="font-medium text-primary underline-offset-4 hover:opacity-90 hover:underline"
           >
             Sign in
           </Link>

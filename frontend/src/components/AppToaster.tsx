@@ -2,10 +2,10 @@
 
 import { Toaster } from "react-hot-toast";
 
-const darkToast = {
-  background: "#18181b",
-  color: "#fafafa",
-  border: "1px solid #27272a",
+const lightToast = {
+  background: "#ffffff",
+  color: "#2A2C41",
+  border: "1px solid #e5e7eb",
 };
 
 export function AppToaster() {
@@ -14,9 +14,13 @@ export function AppToaster() {
       position="top-center"
       toastOptions={{
         className: "",
-        style: darkToast,
-        success: { iconTheme: { primary: "#fafafa", secondary: "#18181b" } },
-        error: { iconTheme: { primary: "#fca5a5", secondary: "#18181b" } },
+        style: lightToast,
+        success: {
+          iconTheme: { primary: "#FF724C", secondary: "#ffffff" },
+        },
+        error: {
+          iconTheme: { primary: "#dc2626", secondary: "#ffffff" },
+        },
       }}
     />
   );

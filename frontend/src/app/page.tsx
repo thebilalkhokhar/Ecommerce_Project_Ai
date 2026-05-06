@@ -62,37 +62,37 @@ export default async function Home() {
   const { products, categories } = await loadHomeData();
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-zinc-950">
-      <section className="border-b border-zinc-800/80 px-4 py-16 md:py-24 lg:py-28">
+    <div className="flex min-h-0 flex-1 flex-col bg-background">
+      <section className="border-b border-gray-200 px-4 py-16 md:py-24 lg:py-28">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div className="flex flex-col justify-center space-y-8">
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-zinc-500">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-textMain/60">
               ShopOne
             </p>
-            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-zinc-50 md:text-6xl md:leading-[1.02] lg:text-7xl">
+            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-textMain md:text-6xl md:leading-[1.02] lg:text-7xl">
               Elevate your everyday
             </h1>
-            <p className="max-w-lg text-lg leading-relaxed text-zinc-400 md:text-xl">
+            <p className="max-w-lg text-lg leading-relaxed text-textMain/70 md:text-xl">
               A premium edit of essentials — quiet luxury, honest materials, and
               a storefront designed to feel as refined as what you wear.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center rounded-lg bg-zinc-50 px-8 py-3.5 text-sm font-semibold tracking-wide text-zinc-950 transition-colors hover:bg-zinc-200"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold tracking-wide text-white transition-opacity hover:opacity-90"
               >
                 Shop now
               </Link>
               <Link
                 href="/categories"
-                className="inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-transparent px-8 py-3.5 text-sm font-semibold tracking-wide text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-900/50"
+                className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-surface px-8 py-3.5 text-sm font-semibold tracking-wide text-textMain transition-colors hover:border-gray-400 hover:bg-gray-50"
               >
                 Browse categories
               </Link>
             </div>
           </div>
           <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/40 sm:aspect-[16/11] lg:aspect-[4/5] lg:max-h-[min(520px,70vh)]">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-xl sm:aspect-[16/11] lg:aspect-[4/5] lg:max-h-[min(520px,70vh)]">
               <Image
                 src={HERO_IMAGE}
                 alt="Minimal clothing boutique interior with racks and warm lighting"
@@ -102,7 +102,7 @@ export default async function Home() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
               <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-textMain/25 via-transparent to-transparent"
                 aria-hidden
               />
             </div>
@@ -110,9 +110,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="border-b border-zinc-800/80 px-4 py-16">
+      <section className="border-b border-gray-200 px-4 py-16">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
             Browse by category
           </h2>
           <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -121,13 +121,13 @@ export default async function Home() {
                 <li key={c.id}>
                   <Link
                     href={`/categories/${c.id}`}
-                    className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 shadow-sm transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-800/60"
+                    className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-gray-200 bg-surface p-6 shadow-sm transition-all duration-300 hover:border-gray-300 hover:shadow-md"
                   >
-                    <span className="text-lg font-semibold text-zinc-100">
+                    <span className="text-lg font-semibold text-textMain">
                       {c.name}
                     </span>
                     <ArrowRight
-                      className="absolute bottom-6 right-6 h-5 w-5 text-zinc-400 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 group-hover:text-zinc-100"
+                      className="absolute bottom-6 right-6 h-5 w-5 text-textMain/50 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 group-hover:text-primary"
                       aria-hidden
                       strokeWidth={1.75}
                     />
@@ -140,13 +140,13 @@ export default async function Home() {
                   <li key={i}>
                     <Link
                       href="/categories"
-                      className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-dashed border-zinc-800 bg-zinc-900/20 p-6 shadow-sm transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-800/40"
+                      className="group relative flex h-32 flex-col justify-end overflow-hidden rounded-2xl border border-dashed border-gray-300 bg-surface/80 p-6 shadow-sm transition-all duration-300 hover:border-gray-400 hover:bg-white"
                     >
-                      <span className="text-lg font-semibold text-zinc-400">
+                      <span className="text-lg font-semibold text-textMain/70">
                         Discover
                       </span>
                       <ArrowRight
-                        className="absolute bottom-6 right-6 h-5 w-5 text-zinc-500 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-70 group-hover:text-zinc-300"
+                        className="absolute bottom-6 right-6 h-5 w-5 text-textMain/40 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 group-hover:text-primary"
                         aria-hidden
                         strokeWidth={1.75}
                       />
@@ -163,16 +163,16 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+              <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
                 Featured
               </h2>
-              <p className="mt-2 text-2xl font-semibold tracking-tight text-zinc-50">
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-textMain">
                 New in
               </p>
             </div>
             <Link
               href="/products"
-              className="text-sm font-medium text-zinc-400 underline-offset-4 hover:text-zinc-200 hover:underline"
+              className="text-sm font-medium text-textMain/70 underline-offset-4 hover:text-primary hover:underline"
             >
               View all
             </Link>
@@ -187,7 +187,7 @@ export default async function Home() {
               ))}
             </ul>
           ) : (
-            <p className="mt-10 rounded-lg border border-zinc-800 bg-zinc-900/30 py-12 text-center text-sm text-zinc-500">
+            <p className="mt-10 rounded-lg border border-gray-200 bg-surface py-12 text-center text-sm text-textMain/70 shadow-sm">
               Products will appear here when your catalog is ready.
             </p>
           )}

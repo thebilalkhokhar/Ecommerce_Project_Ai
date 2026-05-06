@@ -44,7 +44,7 @@ export function WishlistButton({
           setIsLoading(false);
         }
       }}
-      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 text-zinc-300 transition hover:border-zinc-500 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-50 text-textMain/80 transition hover:border-primary/50 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
       aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
       title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
     >

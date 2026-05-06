@@ -51,20 +51,20 @@ export function Navbar() {
   const closeMobile = () => setIsMobileMenuOpen(false);
 
   const linkDesktop =
-    "inline-flex items-center gap-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-50";
+    "inline-flex items-center gap-2 text-sm font-medium text-textMain/70 transition-colors hover:text-textMain";
 
   const linkMobile =
-    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-50";
+    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-textMain transition-colors hover:bg-gray-100";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm print:hidden">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-surface/95 backdrop-blur-sm print:hidden">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
         <div className="flex min-w-0 flex-1 items-center gap-3 md:flex-initial">
           <button
             type="button"
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-            className="inline-flex rounded-md p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50 md:hidden"
+            className="inline-flex rounded-md p-2 text-textMain/70 transition hover:bg-gray-100 hover:text-textMain md:hidden"
             onClick={() => setIsMobileMenuOpen((v) => !v)}
           >
             {isMobileMenuOpen ? (
@@ -75,7 +75,7 @@ export function Navbar() {
           </button>
           <Link
             href="/"
-            className="truncate text-lg font-semibold tracking-tight text-zinc-50"
+            className="truncate text-lg font-semibold tracking-tight text-textMain"
             onClick={closeMobile}
           >
             ShopOne
@@ -128,19 +128,19 @@ export function Navbar() {
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link
             href="/wishlist"
-            className="rounded-md p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50"
+            className="rounded-md p-2 text-textMain/70 transition hover:bg-gray-100 hover:text-textMain"
             aria-label="Wishlist"
           >
             <Heart className="h-5 w-5" strokeWidth={1.75} />
           </Link>
           <Link
             href="/cart"
-            className="relative flex items-center rounded-md p-2 text-zinc-300 transition hover:bg-zinc-900"
+            className="relative flex items-center rounded-md p-2 text-textMain transition hover:bg-gray-100"
             aria-label={`Cart, ${itemCount} items`}
           >
             <ShoppingBag className="h-5 w-5" strokeWidth={1.75} />
             {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-zinc-50 px-1 text-[10px] font-medium text-zinc-950">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-medium text-textMain">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
@@ -149,7 +149,7 @@ export function Navbar() {
       </div>
 
       <div
-        className={`md:hidden overflow-hidden border-b border-zinc-800 bg-zinc-950 transition-all duration-300 ease-in-out print:hidden ${
+        className={`md:hidden overflow-hidden border-b border-gray-200 bg-surface transition-all duration-300 ease-in-out print:hidden ${
           isMobileMenuOpen
             ? "max-h-[28rem] opacity-100"
             : "max-h-0 border-transparent opacity-0"
@@ -161,25 +161,31 @@ export function Navbar() {
           aria-label="Mobile"
         >
           <Link href="/products" className={linkMobile} onClick={closeMobile}>
-            <LayoutGrid className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+            <LayoutGrid
+              className="h-4 w-4 text-textMain/60"
+              strokeWidth={1.75}
+            />
             Products
           </Link>
           {isAuthenticated && (
             <Link href="/orders" className={linkMobile} onClick={closeMobile}>
-              <Package className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              <Package
+                className="h-4 w-4 text-textMain/60"
+                strokeWidth={1.75}
+              />
               Orders
             </Link>
           )}
           {isAuthenticated && (
             <Link href="/profile" className={linkMobile} onClick={closeMobile}>
-              <User className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              <User className="h-4 w-4 text-textMain/60" strokeWidth={1.75} />
               Profile
             </Link>
           )}
           {isAuthenticated && user?.is_admin && (
             <Link href="/admin" className={linkMobile} onClick={closeMobile}>
               <ShieldCheck
-                className="h-4 w-4 text-zinc-500"
+                className="h-4 w-4 text-textMain/60"
                 strokeWidth={1.75}
               />
               Admin
@@ -194,12 +200,15 @@ export function Navbar() {
                 closeMobile();
               }}
             >
-              <LogOut className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              <LogOut
+                className="h-4 w-4 text-textMain/60"
+                strokeWidth={1.75}
+              />
               Logout
             </button>
           ) : (
             <Link href="/login" className={linkMobile} onClick={closeMobile}>
-              <LogIn className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
+              <LogIn className="h-4 w-4 text-textMain/60" strokeWidth={1.75} />
               Login
             </Link>
           )}

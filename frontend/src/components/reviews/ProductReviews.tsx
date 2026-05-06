@@ -29,8 +29,8 @@ function StarRow({ rating }: { rating: number }) {
           key={n}
           className={`h-4 w-4 ${
             n <= rating
-              ? "fill-amber-400 text-amber-400"
-              : "fill-none text-zinc-600"
+              ? "fill-secondary text-secondary"
+              : "fill-none text-textMain/50"
           }`}
           strokeWidth={1.25}
         />
@@ -96,21 +96,21 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
   }
 
   return (
-    <section className="mt-16 border-t border-zinc-800 pt-12">
+    <section className="mt-16 border-t border-gray-200 pt-12">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold tracking-tight text-zinc-50">
+        <h2 className="text-xl font-semibold tracking-tight text-textMain">
           Customer Reviews
         </h2>
         {isAuthenticated ? (
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
-            className="rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:border-zinc-500"
+            className="rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-textMain transition hover:border-primary/50"
           >
             {showForm ? "Cancel" : "Write a Review"}
           </button>
         ) : (
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-textMain/60">
             Please log in to write a review.
           </p>
         )}
@@ -121,9 +121,9 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-zinc-500">Loading reviews…</p>
+        <p className="text-sm text-textMain/60">Loading reviews…</p>
       ) : reviews.length === 0 ? (
-        <p className="rounded-lg border border-zinc-800 border-dashed bg-zinc-900/20 py-10 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-gray-200 border-dashed bg-gray-50 py-10 text-center text-sm text-textMain/60">
           No reviews yet. Be the first to share your thoughts.
         </p>
       ) : (
@@ -133,45 +133,45 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             return (
               <li
                 key={r.id}
-                className="rounded-lg border border-zinc-800 bg-zinc-900 p-4"
+                className="rounded-lg border border-gray-200 bg-gray-50 p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-medium text-zinc-100">{displayName}</p>
+                    <p className="font-medium text-textMain">{displayName}</p>
                     <div className="mt-1">
                       <StarRow rating={r.rating} />
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {r.is_verified_purchase && (
-                      <span className="rounded-full border border-emerald-800/60 bg-emerald-950/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-400">
+                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-800">
                         Verified Purchase
                       </span>
                     )}
                   </div>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-300">
+                <p className="mt-3 text-sm leading-relaxed text-textMain/80">
                   {r.comment}
                 </p>
                 {r.admin_reply ? (
-                  <div className="mt-3 border-l-2 border-zinc-500 bg-zinc-950 p-3 text-sm text-zinc-400">
-                    <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  <div className="mt-3 border-l-2 border-primary/40 bg-gray-50 p-3 text-sm text-textMain/70">
+                    <p className="text-xs font-medium uppercase tracking-wider text-textMain/60">
                       Store
                     </p>
                     <p className="mt-1">{r.admin_reply}</p>
                   </div>
                 ) : null}
-                <div className="mt-3 flex items-center gap-3 border-t border-zinc-800 pt-3">
+                <div className="mt-3 flex items-center gap-3 border-t border-gray-200 pt-3">
                   <button
                     type="button"
                     disabled={reactingId === r.id}
                     onClick={() => handleHelpful(r.id)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1 text-xs font-medium text-zinc-400 transition hover:border-zinc-600 hover:text-zinc-200 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-surface px-2.5 py-1 text-xs font-medium text-textMain/70 transition hover:border-gray-300 hover:text-textMain disabled:opacity-50"
                   >
                     <ThumbsUp className="h-3.5 w-3.5" strokeWidth={1.5} />
                     Helpful
                     {r.likes_count > 0 ? (
-                      <span className="tabular-nums text-zinc-500">
+                      <span className="tabular-nums text-textMain/60">
                         ({r.likes_count})
                       </span>
                     ) : null}

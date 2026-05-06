@@ -23,16 +23,16 @@ export default async function CategoriesPage() {
 
   return (
     <div className="mx-auto max-w-6xl flex-1 px-4 py-14 md:py-20">
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-50 md:text-4xl">
+      <h1 className="text-3xl font-bold tracking-tight text-textMain md:text-4xl">
         Categories
       </h1>
-      <p className="mt-3 max-w-2xl text-lg leading-relaxed text-zinc-400">
+      <p className="mt-3 max-w-2xl text-lg leading-relaxed text-textMain/70">
         Explore the catalog by category — each collection is curated for calm,
         considered shopping.
       </p>
 
       {categories.length === 0 ? (
-        <p className="mt-12 rounded-xl border border-zinc-800 bg-zinc-950 py-16 text-center text-sm text-zinc-500">
+        <p className="mt-12 rounded-xl border border-gray-200 bg-surface py-16 text-center text-sm text-textMain/60">
           No categories yet. Check back soon.
         </p>
       ) : (
@@ -41,17 +41,17 @@ export default async function CategoriesPage() {
             <li key={c.id}>
               <Link
                 href={`/products?category_id=${c.id}`}
-                className="group flex min-h-[140px] flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/40 p-8 transition-all duration-200 hover:border-zinc-600 hover:bg-zinc-900/70"
+                className="group flex min-h-[140px] flex-col justify-between rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50/70"
               >
-                <span className="text-lg font-semibold tracking-tight text-zinc-50 group-hover:text-zinc-100">
+                <span className="text-lg font-semibold tracking-tight text-textMain group-hover:text-textMain">
                   {c.name}
                 </span>
                 {c.description ? (
-                  <span className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-500">
+                  <span className="mt-3 line-clamp-2 text-sm leading-relaxed text-textMain/60">
                     {c.description}
                   </span>
                 ) : (
-                  <span className="mt-3 text-sm text-zinc-500">
+                  <span className="mt-3 text-sm text-textMain/60">
                     View products in this category
                   </span>
                 )}

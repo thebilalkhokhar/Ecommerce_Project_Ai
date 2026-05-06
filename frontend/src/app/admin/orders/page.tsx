@@ -109,61 +109,61 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <header className="mb-8 border-b border-zinc-800 pb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+      <header className="mb-8 border-b border-gray-200 pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
           Orders
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-textMain/60">
           Review and update order statuses.
         </p>
       </header>
 
       {isLoading ? (
-        <p className="text-sm text-zinc-500" aria-live="polite">
+        <p className="text-sm text-textMain/60" aria-live="polite">
           Loading orders…
         </p>
       ) : orders.length === 0 ? (
-        <p className="rounded-lg border border-zinc-800 bg-zinc-900/30 py-12 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-gray-200 bg-gray-50 py-12 text-center text-sm text-textMain/60">
           No orders yet.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-zinc-800">
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900/50">
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <tr className="border-b border-gray-200 bg-gray-100">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Order ID
                 </th>
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Date
                 </th>
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Customer
                 </th>
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Total
                 </th>
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Status
                 </th>
-                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-gray-200">
               {orders.map((order) => (
-                <tr key={order.id} className="bg-zinc-950/80 hover:bg-zinc-900/30">
-                  <td className="px-4 py-3 tabular-nums text-zinc-300">
+                <tr key={order.id} className="bg-surface hover:bg-gray-50">
+                  <td className="px-4 py-3 tabular-nums text-textMain/80">
                     #{order.id}
                   </td>
-                  <td className="px-4 py-3 text-zinc-400">
+                  <td className="px-4 py-3 text-textMain/70">
                     {formatOrderDate(order.created_at)}
                   </td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-zinc-300" title={customerLabel(order)}>
+                  <td className="max-w-[200px] truncate px-4 py-3 text-textMain/80" title={customerLabel(order)}>
                     {customerLabel(order)}
                   </td>
-                  <td className="px-4 py-3 tabular-nums text-zinc-200">
+                  <td className="px-4 py-3 tabular-nums text-textMain">
                     {formatMoney(order.total_price)}
                   </td>
                   <td className="px-4 py-3">
@@ -176,7 +176,7 @@ export default function AdminOrdersPage() {
                           e.target.value as OrderStatus,
                         )
                       }
-                      className="w-full max-w-[140px] rounded-md border border-zinc-800 bg-zinc-900 py-1.5 pl-2 pr-8 text-xs font-medium text-zinc-100 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 disabled:opacity-50"
+                      className="w-full max-w-[140px] rounded-md border border-gray-200 bg-gray-50 py-1.5 pl-2 pr-8 text-xs font-medium text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35 disabled:opacity-50"
                       aria-label={`Status for order ${order.id}`}
                     >
                       {STATUSES.map((s) => (
@@ -191,7 +191,7 @@ export default function AdminOrdersPage() {
                       href={`/orders/${order.id}/receipt`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex rounded-md border border-zinc-700 p-2 text-zinc-400 transition hover:border-zinc-500 hover:bg-zinc-900 hover:text-zinc-50"
+                      className="inline-flex rounded-md border border-gray-300 p-2 text-textMain/70 transition hover:border-primary/50 hover:bg-gray-50 hover:text-textMain"
                       aria-label={`Print receipt for order ${order.id}`}
                     >
                       <Printer className="h-4 w-4" strokeWidth={1.75} />

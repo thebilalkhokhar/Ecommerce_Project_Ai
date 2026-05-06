@@ -170,24 +170,24 @@ export default function CheckoutPage() {
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-      <nav className="mb-8 text-sm text-zinc-500">
-        <Link href="/cart" className="hover:text-zinc-300">
+      <nav className="mb-8 text-sm text-textMain/60">
+        <Link href="/cart" className="hover:text-textMain/80">
           Cart
         </Link>
-        <span className="mx-2 text-zinc-700">/</span>
-        <span className="text-zinc-400">Checkout</span>
+        <span className="mx-2 text-textMain/40">/</span>
+        <span className="text-textMain/70">Checkout</span>
       </nav>
 
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+      <h1 className="text-2xl font-semibold tracking-tight text-textMain">
         Checkout
       </h1>
-      <p className="mt-1 text-sm text-zinc-500">
+      <p className="mt-1 text-sm text-textMain/60">
         Review your order and choose how you&apos;ll pay.
       </p>
 
       {checkoutError && (
         <p
-          className="mt-6 rounded-md border border-red-900/50 bg-red-950/30 px-4 py-3 text-sm text-red-200"
+          className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
           role="alert"
         >
           {checkoutError}
@@ -195,11 +195,11 @@ export default function CheckoutPage() {
       )}
 
       {items.length === 0 ? (
-        <div className="mt-10 rounded-lg border border-zinc-800 bg-zinc-950 px-6 py-14 text-center">
-          <p className="text-sm text-zinc-400">Your cart is empty.</p>
+        <div className="mt-10 rounded-lg border border-gray-200 bg-surface px-6 py-14 text-center">
+          <p className="text-sm text-textMain/70">Your cart is empty.</p>
           <Link
             href="/products"
-            className="mt-6 inline-block text-sm font-medium text-zinc-50 underline decoration-zinc-600 underline-offset-4 hover:decoration-zinc-400"
+            className="mt-6 inline-block text-sm font-medium text-textMain underline decoration-textMain/35 underline-offset-4 hover:decoration-primary"
           >
             Continue shopping
           </Link>
@@ -207,27 +207,27 @@ export default function CheckoutPage() {
       ) : (
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-950">
-              <h2 className="border-b border-zinc-800 px-5 py-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+            <div className="rounded-lg border border-gray-200 bg-surface">
+              <h2 className="border-b border-gray-200 px-5 py-4 text-sm font-medium uppercase tracking-wider text-textMain/60">
                 Items
               </h2>
-              <ul className="divide-y divide-zinc-800">
+              <ul className="divide-y divide-gray-200">
                 {items.map((line) => (
                   <li key={`${line.product.id}::${line.product.variant_name ?? ""}`} className="px-5 py-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="font-medium text-zinc-50">{line.product.name}</p>
-                      <p className="text-sm tabular-nums text-zinc-300">
+                      <p className="font-medium text-textMain">{line.product.name}</p>
+                      <p className="text-sm tabular-nums text-textMain/80">
                         {formatMoney(line.product.price * line.quantity)}
                       </p>
                     </div>
                     {line.product.variant_name ? (
                       <p className="mt-2">
-                        <span className="inline-block rounded bg-zinc-900 px-2 py-1 text-xs text-zinc-400">
+                        <span className="inline-block rounded bg-gray-50 px-2 py-1 text-xs text-textMain/70">
                           {line.product.variant_name}
                         </span>
                       </p>
                     ) : null}
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-xs text-textMain/60">
                       Qty {line.quantity} × {formatMoney(line.product.price)}
                     </p>
                   </li>
@@ -238,85 +238,85 @@ export default function CheckoutPage() {
 
           <aside className="lg:col-span-1">
             <div className="sticky top-4 space-y-6">
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-                <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <div className="rounded-lg border border-gray-200 bg-surface p-6">
+                <h2 className="text-sm font-medium uppercase tracking-wider text-textMain/60">
                   Order summary
                 </h2>
                 <dl className="mt-6 space-y-3 text-sm">
-                  <div className="flex justify-between text-zinc-400">
+                  <div className="flex justify-between text-textMain/70">
                     <dt>Subtotal</dt>
-                    <dd className="tabular-nums text-zinc-200">
+                    <dd className="tabular-nums text-textMain">
                       {formatMoney(subtotal)}
                     </dd>
                   </div>
-                  <div className="flex justify-between text-zinc-400">
+                  <div className="flex justify-between text-textMain/70">
                     <dt>Shipping</dt>
-                    <dd className="text-zinc-200">{shippingLabel}</dd>
+                    <dd className="text-textMain">{shippingLabel}</dd>
                   </div>
-                  <div className="flex justify-between border-t border-zinc-800 pt-3 text-base font-medium text-zinc-50">
+                  <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-medium text-textMain">
                     <dt>Total</dt>
                     <dd className="tabular-nums">{formatMoney(orderTotal)}</dd>
                   </div>
                 </dl>
               </div>
 
-              <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-6">
-                <h2 className="text-lg font-medium text-zinc-50 mb-4">
+              <div className="rounded-lg border border-gray-200 bg-surface p-6">
+                <h2 className="text-lg font-medium text-textMain mb-4">
                   Payment method
                 </h2>
                 <div className="flex flex-col gap-3">
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
                     <input
                       type="radio"
                       name="payment"
                       value="cod"
                       checked={paymentMethod === "cod"}
                       onChange={() => setPaymentMethod("cod")}
-                      className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-zinc-50">
+                      <span className="block text-sm font-medium text-textMain">
                         Cash on Delivery
                       </span>
-                      <span className="mt-0.5 block text-xs text-zinc-400">
+                      <span className="mt-0.5 block text-xs text-textMain/70">
                         Pay when your order arrives.
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
                     <input
                       type="radio"
                       name="payment"
                       value="stripe"
                       checked={paymentMethod === "stripe"}
                       onChange={() => setPaymentMethod("stripe")}
-                      className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-zinc-50">
+                      <span className="block text-sm font-medium text-textMain">
                         Credit / Debit Card (Stripe)
                       </span>
-                      <span className="mt-0.5 block text-xs text-zinc-400">
+                      <span className="mt-0.5 block text-xs text-textMain/70">
                         Secure payment via Stripe Checkout.
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-300 bg-zinc-800/50 p-4 transition hover:border-zinc-400 has-checked:border-zinc-200">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
                     <input
                       type="radio"
                       name="payment"
                       value="payflow"
                       checked={paymentMethod === "payflow"}
                       onChange={() => setPaymentMethod("payflow")}
-                      className="mt-1 h-4 w-4 shrink-0 border-zinc-600 bg-zinc-900 text-zinc-50 focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-zinc-50">
+                      <span className="block text-sm font-medium text-textMain">
                         Credit Card (Payflow)
                       </span>
-                      <span className="mt-0.5 block text-xs text-zinc-400">
+                      <span className="mt-0.5 block text-xs text-textMain/70">
                         PayPal Payflow Pro — card processed on our servers.
                       </span>
                     </span>
@@ -324,15 +324,15 @@ export default function CheckoutPage() {
                 </div>
 
                 {payflowSelected && (
-                  <div className="mt-5 space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/40 p-4">
-                    <p className="text-xs text-zinc-500">
+                  <div className="mt-5 space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <p className="text-xs text-textMain/60">
                       Enter your card details exactly as shown on the card. Expiry as
                       MMYY (e.g. 1226).
                     </p>
                     <div>
                       <label
                         htmlFor="payflow-card"
-                        className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                        className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
                       >
                         Card number
                       </label>
@@ -344,7 +344,7 @@ export default function CheckoutPage() {
                         maxLength={23}
                         value={payflowCard}
                         onChange={(e) => setPayflowCard(e.target.value)}
-                        className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                        className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
                         placeholder="0000 0000 0000 0000"
                       />
                     </div>
@@ -352,7 +352,7 @@ export default function CheckoutPage() {
                       <div>
                         <label
                           htmlFor="payflow-exp"
-                          className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                          className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
                         >
                           Expiry (MMYY)
                         </label>
@@ -366,14 +366,14 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setPayflowExpiry(e.target.value.replace(/\D/g, "").slice(0, 4))
                           }
-                          className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                          className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
                           placeholder="MMYY"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="payflow-cvv"
-                          className="block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                          className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
                         >
                           CVV
                         </label>
@@ -387,7 +387,7 @@ export default function CheckoutPage() {
                           onChange={(e) =>
                             setPayflowCvv(e.target.value.replace(/\D/g, "").slice(0, 4))
                           }
-                          className="mt-1.5 w-full rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none focus:ring-0"
+                          className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
                           placeholder="•••"
                         />
                       </div>
@@ -400,7 +400,7 @@ export default function CheckoutPage() {
                 type="button"
                 disabled={submitting || items.length === 0}
                 onClick={() => void handlePlaceOrder()}
-                className="w-full rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="w-full rounded-md bg-primary py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {submitting
                   ? paymentMethod === "stripe"
@@ -416,7 +416,7 @@ export default function CheckoutPage() {
               </button>
 
               {!isAuthenticated && items.length > 0 && (
-                <p className="text-center text-xs text-zinc-500">
+                <p className="text-center text-xs text-textMain/60">
                   You&apos;ll be asked to sign in when you place the order.
                 </p>
               )}

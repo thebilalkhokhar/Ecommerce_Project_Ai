@@ -81,18 +81,18 @@ export function ChatbotWidget() {
       <div className="pointer-events-auto flex flex-col items-end gap-3">
         {isOpen && (
           <div
-            className="flex h-120 w-80 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 sm:w-96"
+            className="flex h-120 w-80 flex-col overflow-hidden rounded-xl border border-gray-200 bg-surface sm:w-96"
             role="dialog"
             aria-label="Store assistant chat"
           >
-            <header className="flex shrink-0 items-center justify-between border-b border-zinc-800 px-4 py-3">
-              <h2 className="text-sm font-semibold tracking-tight text-zinc-50">
+            <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
+              <h2 className="text-sm font-semibold tracking-tight text-textMain">
                 Store Assistant
               </h2>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-md p-1.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-50"
+                className="rounded-md p-1.5 text-textMain/70 transition hover:bg-gray-50 hover:text-textMain"
                 aria-label="Close chat"
               >
                 <X className="h-4 w-4" strokeWidth={1.5} />
@@ -104,7 +104,7 @@ export function ChatbotWidget() {
               className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
               {messages.length === 0 && !isLoading && (
-                <p className="px-1 text-center text-xs leading-relaxed text-zinc-500">
+                <p className="px-1 text-center text-xs leading-relaxed text-textMain/60">
                   Ask about products, stock, or anything in our catalog.
                 </p>
               )}
@@ -116,8 +116,8 @@ export function ChatbotWidget() {
                   <div
                     className={
                       m.role === "user"
-                        ? "max-w-[85%] rounded-lg bg-zinc-800 px-3 py-2 text-sm text-zinc-50"
-                        : "max-w-[85%] rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200"
+                        ? "max-w-[85%] rounded-lg bg-gray-200 px-3 py-2 text-sm text-textMain"
+                        : "max-w-[85%] rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain"
                     }
                   >
                     <p className="whitespace-pre-wrap wrap-break-word">{m.content}</p>
@@ -126,7 +126,7 @@ export function ChatbotWidget() {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-500">
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain/60">
                     <span className="inline-flex gap-1">
                       <span className="animate-pulse">Thinking</span>
                       <span className="tabular-nums">…</span>
@@ -136,7 +136,7 @@ export function ChatbotWidget() {
               )}
             </div>
 
-            <div className="shrink-0 border-t border-zinc-800 p-3">
+            <div className="shrink-0 border-t border-gray-200 p-3">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -145,14 +145,14 @@ export function ChatbotWidget() {
                   onKeyDown={handleKeyDown}
                   placeholder="Message…"
                   disabled={isLoading}
-                  className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-0 disabled:opacity-50"
+                  className="min-w-0 flex-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-0 disabled:opacity-50"
                   aria-label="Message"
                 />
                 <button
                   type="button"
                   onClick={() => void sendMessage()}
                   disabled={isLoading || !input.trim()}
-                  className="shrink-0 rounded-md border border-zinc-700 p-2 text-zinc-200 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="shrink-0 rounded-md bg-primary p-2 text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label="Send"
                 >
                   <Send className="h-4 w-4" strokeWidth={1.5} />
@@ -165,13 +165,13 @@ export function ChatbotWidget() {
         <button
           type="button"
           onClick={() => setIsOpen((o) => !o)}
-          className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 text-zinc-950 shadow-xl transition-transform duration-300 hover:scale-110 hover:shadow-zinc-500/20"
+          className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-transform duration-300 hover:scale-110 hover:opacity-90"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close assistant" : "Open assistant"}
         >
           <span className="absolute right-0 top-0 flex h-3.5 w-3.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400 opacity-75" />
-            <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-zinc-100 bg-zinc-300" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-secondary opacity-75" />
+            <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-secondary" />
           </span>
           <Bot
             className="h-6 w-6 group-hover:animate-pulse"

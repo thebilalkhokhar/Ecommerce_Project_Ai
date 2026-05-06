@@ -9,10 +9,10 @@ function ProductsFallback() {
         aria-live="polite"
         aria-busy="true"
       >
-        <div className="h-1 w-24 overflow-hidden rounded-full bg-zinc-800">
-          <div className="h-full w-1/2 animate-pulse rounded-full bg-zinc-500" />
+        <div className="h-1 w-24 overflow-hidden rounded-full bg-gray-200">
+          <div className="h-full w-1/2 animate-pulse rounded-full bg-gray-200" />
         </div>
-        <p className="text-sm text-zinc-500">Loading…</p>
+        <p className="text-sm text-textMain/60">Loading…</p>
       </div>
     </main>
   );

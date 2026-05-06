@@ -4,31 +4,31 @@ const year = new Date().getFullYear();
 
 export function Footer() {
   return (
-    <footer className="border-t border-zinc-800 bg-zinc-950 print:hidden">
+    <footer className="border-t border-gray-200 bg-surface print:hidden">
       <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4 md:gap-12 lg:gap-16">
           <div className="space-y-5">
-            <p className="text-lg font-semibold tracking-tight text-zinc-50">
+            <p className="text-lg font-semibold tracking-tight text-textMain">
               ShopOne
             </p>
-            <p className="max-w-xs text-sm leading-relaxed text-zinc-400">
+            <p className="max-w-xs text-sm leading-relaxed text-textMain/70">
               A calm, minimal storefront for refined essentials — curated with
               care and built for clarity.
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-textMain/60">
               © {year} ShopOne. All rights reserved.
             </p>
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-textMain/60">
               Shop
             </h3>
             <ul className="mt-5 space-y-3 text-sm">
               <li>
                 <Link
                   href="/products"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Products
                 </Link>
@@ -36,7 +36,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/categories"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Categories
                 </Link>
@@ -44,7 +44,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/wishlist"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Wishlist
                 </Link>
@@ -53,14 +53,14 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-textMain/60">
               Support
             </h3>
             <ul className="mt-5 space-y-3 text-sm">
               <li>
                 <Link
                   href="/contact"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Contact
                 </Link>
@@ -68,7 +68,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/faq"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   FAQs
                 </Link>
@@ -76,7 +76,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/orders"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Order tracking
                 </Link>
@@ -85,14 +85,14 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-textMain/60">
               Policies
             </h3>
             <ul className="mt-5 space-y-3 text-sm">
               <li>
                 <Link
                   href="/privacy"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Privacy policy
                 </Link>
@@ -100,7 +100,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/terms"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Terms of service
                 </Link>
@@ -108,7 +108,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/refunds"
-                  className="text-zinc-400 transition-colors hover:text-zinc-50"
+                  className="text-textMain/70 transition-colors hover:text-textMain"
                 >
                   Refund policy
                 </Link>

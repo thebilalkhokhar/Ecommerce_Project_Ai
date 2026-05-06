@@ -1,25 +1,30 @@
 @import "tailwindcss";
 
-/* Strict dark minimal base — zinc-950 / zinc-50 */
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #f4f4f8;
+  --surface: #ffffff;
+  --text-main: #2a2c41;
+  --primary: #ff724c;
+  --secondary: #fdbf50;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-textMain: var(--text-main);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @layer base {
   html {
-    @apply bg-zinc-950 text-zinc-50;
+    @apply bg-background text-textMain;
   }
 
   body {
-    @apply min-h-full bg-zinc-950 text-zinc-50 antialiased;
+    @apply min-h-full bg-background text-textMain antialiased;
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }

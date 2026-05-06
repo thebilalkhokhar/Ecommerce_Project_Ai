@@ -34,10 +34,10 @@ export function ProductCard({ product }: ProductCardProps) {
     typeof product.image_url === "string" && product.image_url.length > 0;
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-sm shadow-black/20">
+    <article className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-surface shadow-md">
       <Link
         href={`/products/${product.id}`}
-        className="relative aspect-square w-full overflow-hidden border-b border-zinc-800 bg-zinc-900 outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-zinc-500"
+        className="relative aspect-square w-full overflow-hidden border-b border-gray-100 bg-gray-50 outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         {hasImage ? (
           <Image
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <ImageIcon
-              className="h-10 w-10 text-zinc-600"
+              className="h-10 w-10 text-textMain/40"
               strokeWidth={1.25}
               aria-hidden
             />
@@ -61,15 +61,15 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-1">
-          <h3 className="text-[15px] font-semibold leading-snug tracking-tight text-zinc-50">
+          <h3 className="text-[15px] font-semibold leading-snug tracking-tight text-textMain">
             <Link
               href={`/products/${product.id}`}
-              className="hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+              className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               {product.name}
             </Link>
           </h3>
-          <p className="text-sm tabular-nums tracking-wide text-zinc-400">
+          <p className="text-sm tabular-nums tracking-wide text-textMain/70">
             {formatPrice(product.price)}
           </p>
         </div>
@@ -85,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
             });
             toast.success(`${product.name} added to cart!`);
           }}
-          className="mt-auto w-full rounded-md border border-zinc-700 py-2.5 text-xs font-medium tracking-wide text-zinc-100 transition-colors hover:border-zinc-100 hover:bg-zinc-50 hover:text-zinc-950 disabled:cursor-not-allowed disabled:border-zinc-800 disabled:text-zinc-600 disabled:hover:bg-transparent disabled:hover:text-zinc-600"
+          className="mt-auto w-full rounded-md bg-primary py-2.5 text-xs font-medium tracking-wide text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-textMain/50 disabled:opacity-100 disabled:hover:opacity-100"
         >
           {outOfStock ? "Out of stock" : "Add to cart"}
         </button>

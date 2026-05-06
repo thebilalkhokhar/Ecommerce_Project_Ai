@@ -73,27 +73,27 @@ export default async function CategoryDetailPage({
 
   return (
     <div className="mx-auto max-w-6xl flex-1 px-4 py-12 md:py-16">
-      <nav className="mb-8 text-sm text-zinc-500">
-        <Link href="/" className="hover:text-zinc-300">
+      <nav className="mb-8 text-sm text-textMain/60">
+        <Link href="/" className="hover:text-textMain/80">
           Home
         </Link>
-        <span className="mx-2 text-zinc-700">/</span>
-        <Link href="/categories" className="hover:text-zinc-300">
+        <span className="mx-2 text-textMain/40">/</span>
+        <Link href="/categories" className="hover:text-textMain/80">
           Categories
         </Link>
-        <span className="mx-2 text-zinc-700">/</span>
-        <span className="text-zinc-400">{categoryName}</span>
+        <span className="mx-2 text-textMain/40">/</span>
+        <span className="text-textMain/70">{categoryName}</span>
       </nav>
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl">
+      <h1 className="text-2xl font-semibold tracking-tight text-textMain md:text-3xl">
         {categoryName}
       </h1>
-      <p className="mt-2 text-sm text-zinc-500">
+      <p className="mt-2 text-sm text-textMain/60">
         {products.length} product{products.length === 1 ? "" : "s"} in this
         category.
       </p>
 
       {products.length === 0 ? (
-        <p className="mt-12 rounded-xl border border-zinc-800 bg-zinc-950 py-14 text-center text-sm text-zinc-500">
+        <p className="mt-12 rounded-xl border border-gray-200 bg-surface py-14 text-center text-sm text-textMain/60">
           No products in this category yet.
         </p>
       ) : (
@@ -109,7 +109,7 @@ export default async function CategoryDetailPage({
       <p className="mt-12">
         <Link
           href="/categories"
-          className="text-sm font-medium text-zinc-400 hover:text-zinc-200"
+          className="text-sm font-medium text-textMain/70 hover:text-textMain"
         >
           ← All categories
         </Link>

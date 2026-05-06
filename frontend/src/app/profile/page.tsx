@@ -131,33 +131,33 @@ export default function ProfilePage() {
     return (
       <div className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-4 py-24">
         <Loader2
-          className="h-8 w-8 animate-spin text-zinc-500"
+          className="h-8 w-8 animate-spin text-textMain/60"
           strokeWidth={1.5}
           aria-hidden
         />
-        <p className="mt-4 text-sm text-zinc-500">Loading profile…</p>
+        <p className="mt-4 text-sm text-textMain/60">Loading profile…</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl">
+      <h1 className="text-2xl font-semibold tracking-tight text-textMain md:text-3xl">
         My Profile
       </h1>
-      <p className="mt-2 text-sm text-zinc-500">
+      <p className="mt-2 text-sm text-textMain/60">
         Update your contact details. Email cannot be changed here.
       </p>
 
       <form
         onSubmit={handleSubmit}
-        className="mt-10 space-y-6 rounded-xl border border-zinc-800 bg-zinc-950 p-6 md:p-8"
+        className="mt-10 space-y-6 rounded-xl border border-gray-200 bg-surface p-6 md:p-8"
       >
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label
               htmlFor="full_name"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               Full name
             </label>
@@ -171,14 +171,14 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, full_name: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div className="sm:col-span-2">
             <label
               htmlFor="phone_number"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               Phone number
             </label>
@@ -192,14 +192,14 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, phone_number: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div className="sm:col-span-2">
             <label
               htmlFor="address_line_1"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               Address line 1
             </label>
@@ -213,16 +213,16 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, address_line_1: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div className="sm:col-span-2">
             <label
               htmlFor="address_line_2"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
-              Address line 2 <span className="font-normal normal-case text-zinc-600">(optional)</span>
+              Address line 2 <span className="font-normal normal-case text-textMain/50">(optional)</span>
             </label>
             <input
               id="address_line_2"
@@ -233,14 +233,14 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, address_line_2: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div>
             <label
               htmlFor="city"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               City
             </label>
@@ -254,14 +254,14 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, city: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div>
             <label
               htmlFor="state"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               State / Province
             </label>
@@ -275,14 +275,14 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, state: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
 
           <div className="sm:col-span-2">
             <label
               htmlFor="postal_code"
-              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+              className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-textMain/60"
             >
               Postal code
             </label>
@@ -296,16 +296,16 @@ export default function ProfilePage() {
               onChange={(e) =>
                 setForm((f) => ({ ...f, postal_code: e.target.value }))
               }
-              className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-50 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
             />
           </div>
         </div>
 
-        <div className="border-t border-zinc-800 pt-6">
+        <div className="border-t border-gray-200 pt-6">
           <button
             type="submit"
             disabled={isLoading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[160px] sm:px-8"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-3 text-sm font-medium text-textMain transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[160px] sm:px-8"
           >
             {isLoading ? (
               <>

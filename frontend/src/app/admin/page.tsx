@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
           Dashboard
         </h1>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -110,20 +110,20 @@ export default function AdminDashboardPage() {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 outline-none focus-visible:ring-2 focus-visible:ring-zinc-600"
+            className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain/80 outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
             aria-label="Start date"
           />
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 outline-none focus-visible:ring-2 focus-visible:ring-zinc-600"
+            className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain/80 outline-none focus-visible:ring-2 focus-visible:ring-primary/35"
             aria-label="End date"
           />
           <button
             type="button"
             onClick={() => void loadAnalytics(startDate, endDate)}
-            className="rounded-md border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100 transition hover:bg-zinc-700"
+            className="rounded-md border border-gray-300 bg-gray-200 px-4 py-2 text-sm font-medium text-textMain transition hover:bg-gray-300"
           >
             Filter
           </button>
@@ -131,80 +131,80 @@ export default function AdminDashboardPage() {
       </div>
 
       {isLoading && (
-        <p className="text-sm text-zinc-500">Loading analytics…</p>
+        <p className="text-sm text-textMain/60">Loading analytics…</p>
       )}
 
       {!isLoading && analyticsData && (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-zinc-300">
+            <div className="flex gap-4 rounded-lg border border-gray-200 bg-gray-100 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-surface text-textMain/80">
                 <CircleDollarSign className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <p className="text-xs font-medium uppercase tracking-wide text-textMain/60">
                   Revenue
                 </p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-zinc-50">
+                <p className="mt-1 text-lg font-semibold tabular-nums text-textMain">
                   {formatPKR(analyticsData.total_revenue)}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">In selected range</p>
+                <p className="mt-0.5 text-xs text-textMain/60">In selected range</p>
               </div>
             </div>
 
-            <div className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-zinc-300">
+            <div className="flex gap-4 rounded-lg border border-gray-200 bg-gray-100 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-surface text-textMain/80">
                 <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <p className="text-xs font-medium uppercase tracking-wide text-textMain/60">
                   Orders
                 </p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-zinc-50">
+                <p className="mt-1 text-lg font-semibold tabular-nums text-textMain">
                   {analyticsData.total_orders}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">In selected range</p>
+                <p className="mt-0.5 text-xs text-textMain/60">In selected range</p>
               </div>
             </div>
 
-            <div className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-zinc-300">
+            <div className="flex gap-4 rounded-lg border border-gray-200 bg-gray-100 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-surface text-textMain/80">
                 <Users className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <p className="text-xs font-medium uppercase tracking-wide text-textMain/60">
                   Customers
                 </p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-zinc-50">
+                <p className="mt-1 text-lg font-semibold tabular-nums text-textMain">
                   {analyticsData.total_customers}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">All users</p>
+                <p className="mt-0.5 text-xs text-textMain/60">All users</p>
               </div>
             </div>
 
-            <div className="flex gap-4 rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-zinc-800 bg-zinc-950 text-zinc-300">
+            <div className="flex gap-4 rounded-lg border border-gray-200 bg-gray-100 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-surface text-textMain/80">
                 <Package className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                <p className="text-xs font-medium uppercase tracking-wide text-textMain/60">
                   Products
                 </p>
-                <p className="mt-1 text-lg font-semibold tabular-nums text-zinc-50">
+                <p className="mt-1 text-lg font-semibold tabular-nums text-textMain">
                   {analyticsData.total_products}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">In catalog</p>
+                <p className="mt-0.5 text-xs text-textMain/60">In catalog</p>
               </div>
             </div>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5">
-              <h2 className="mb-4 text-sm font-medium text-zinc-300">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
+              <h2 className="mb-4 text-sm font-medium text-textMain/80">
                 Revenue trend
               </h2>
               {trendChartData.length === 0 ? (
-                <p className="py-12 text-center text-sm text-zinc-500">
+                <p className="py-12 text-center text-sm text-textMain/60">
                   No revenue in this period.
                 </p>
               ) : (
@@ -269,12 +269,12 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
-            <div className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-5">
-              <h2 className="mb-4 text-sm font-medium text-zinc-300">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
+              <h2 className="mb-4 text-sm font-medium text-textMain/80">
                 Order status
               </h2>
               {pieData.length === 0 ? (
-                <p className="py-12 text-center text-sm text-zinc-500">
+                <p className="py-12 text-center text-sm text-textMain/60">
                   No orders in this period.
                 </p>
               ) : (

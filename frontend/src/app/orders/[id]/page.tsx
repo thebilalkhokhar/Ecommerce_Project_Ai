@@ -111,7 +111,7 @@ function OrderDetailContent() {
   if (!orderId) {
     return (
       <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-        <p className="text-sm text-zinc-500">Invalid order.</p>
+        <p className="text-sm text-textMain/60">Invalid order.</p>
       </main>
     );
   }
@@ -119,7 +119,7 @@ function OrderDetailContent() {
   if (!authReady) {
     return (
       <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-        <p className="text-sm text-zinc-500">Loading…</p>
+        <p className="text-sm text-textMain/60">Loading…</p>
       </main>
     );
   }
@@ -128,26 +128,26 @@ function OrderDetailContent() {
     <main className="relative mx-auto max-w-6xl flex-1 px-4 py-12">
       {paySuccessToast && (
         <div
-          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg border border-emerald-800/80 bg-emerald-950/95 px-5 py-3 text-sm font-medium text-emerald-100 shadow-lg shadow-black/40"
+          className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-medium text-emerald-900 shadow-lg"
           role="status"
         >
           Payment successful!
         </div>
       )}
 
-      <nav className="mb-8 text-sm text-zinc-500">
-        <Link href="/orders" className="hover:text-zinc-300">
+      <nav className="mb-8 text-sm text-textMain/60">
+        <Link href="/orders" className="hover:text-textMain/80">
           Orders
         </Link>
-        <span className="mx-2 text-zinc-700">/</span>
-        <span className="text-zinc-400">#{orderId}</span>
+        <span className="mx-2 text-textMain/40">/</span>
+        <span className="text-textMain/70">#{orderId}</span>
       </nav>
 
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+      <h1 className="text-2xl font-semibold tracking-tight text-textMain">
         Order #{orderId}
       </h1>
 
-      {loading && <p className="mt-8 text-sm text-zinc-500">Loading…</p>}
+      {loading && <p className="mt-8 text-sm text-textMain/60">Loading…</p>}
       {error && !loading && (
         <p className="mt-8 text-sm text-red-300" role="alert">
           {error}
@@ -156,36 +156,36 @@ function OrderDetailContent() {
 
       {order && !loading && (
         <div className="mt-10 space-y-8">
-          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wider text-zinc-400">
+          <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wider text-textMain/70">
             <span>{order.status}</span>
-            <span className="text-zinc-700">·</span>
+            <span className="text-textMain/40">·</span>
             <span>{order.is_cod ? "Cash on delivery" : "Card"}</span>
-            <span className="text-zinc-700">·</span>
-            <span className="text-zinc-300">
+            <span className="text-textMain/40">·</span>
+            <span className="text-textMain/80">
               {order.payment_status === "paid" ? "Paid" : "Unpaid"}
             </span>
           </div>
 
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950">
-            <h2 className="border-b border-zinc-800 px-5 py-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+          <div className="rounded-lg border border-gray-200 bg-surface">
+            <h2 className="border-b border-gray-200 px-5 py-4 text-sm font-medium uppercase tracking-wider text-textMain/60">
               Items
             </h2>
-            <ul className="divide-y divide-zinc-800">
+            <ul className="divide-y divide-gray-200">
               {order.items.map((it) => {
                 const label =
                   it.product_name?.trim() || `Product #${it.product_id}`;
                 return (
                   <li key={it.id} className="px-5 py-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="font-medium text-zinc-50">{label}</p>
-                      <p className="text-sm tabular-nums text-zinc-300">
+                      <p className="font-medium text-textMain">{label}</p>
+                      <p className="text-sm tabular-nums text-textMain/80">
                         {formatMoney(lineTotal(it))}
                       </p>
                     </div>
                     {it.variant_name ? (
-                      <p className="mt-1 text-xs text-zinc-500">{it.variant_name}</p>
+                      <p className="mt-1 text-xs text-textMain/60">{it.variant_name}</p>
                     ) : null}
-                    <p className="mt-1 text-xs text-zinc-500">
+                    <p className="mt-1 text-xs text-textMain/60">
                       Qty {it.quantity} × {formatMoney(it.unit_price)}
                     </p>
                   </li>
@@ -194,14 +194,14 @@ function OrderDetailContent() {
             </ul>
           </div>
 
-          <p className="text-lg font-medium tabular-nums text-zinc-100">
+          <p className="text-lg font-medium tabular-nums text-textMain">
             Total: {formatMoney(order.total_price)}
           </p>
 
           <p>
             <Link
               href={`/orders/${order.id}/receipt`}
-              className="text-sm font-medium text-zinc-400 underline-offset-4 hover:text-zinc-200 hover:underline"
+              className="text-sm font-medium text-textMain/70 underline-offset-4 hover:text-textMain hover:underline"
             >
               View receipt
             </Link>
@@ -217,7 +217,7 @@ export default function OrderDetailPage() {
     <Suspense
       fallback={
         <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-          <p className="text-sm text-zinc-500">Loading…</p>
+          <p className="text-sm text-textMain/60">Loading…</p>
         </main>
       }
     >

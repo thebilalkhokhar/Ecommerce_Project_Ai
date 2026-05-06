@@ -73,23 +73,23 @@ function WishlistContent() {
   if (!bootstrapped) {
     return (
       <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-        <p className="text-sm text-zinc-500">Loading…</p>
+        <p className="text-sm text-textMain/60">Loading…</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+      <h1 className="text-2xl font-semibold tracking-tight text-textMain">
         My Wishlist
       </h1>
 
       {!isAuthenticated && (
-        <div className="mt-8 rounded-lg border border-zinc-800 bg-zinc-950 px-6 py-10 text-center">
-          <p className="text-sm text-zinc-400">Sign in to view your wishlist.</p>
+        <div className="mt-8 rounded-lg border border-gray-200 bg-surface px-6 py-10 text-center">
+          <p className="text-sm text-textMain/70">Sign in to view your wishlist.</p>
           <Link
             href="/login?next=/wishlist"
-            className="mt-4 inline-block text-sm font-medium text-zinc-50 underline decoration-zinc-600 underline-offset-4 hover:decoration-zinc-400"
+            className="mt-4 inline-block text-sm font-medium text-textMain underline decoration-textMain/35 underline-offset-4 hover:decoration-primary"
           >
             Sign in
           </Link>
@@ -97,7 +97,7 @@ function WishlistContent() {
       )}
 
       {isAuthenticated && loading && (
-        <p className="mt-8 text-sm text-zinc-500">Loading wishlist…</p>
+        <p className="mt-8 text-sm text-textMain/60">Loading wishlist…</p>
       )}
 
       {isAuthenticated && !loading && error && (
@@ -105,7 +105,7 @@ function WishlistContent() {
       )}
 
       {isAuthenticated && !loading && !error && items.length === 0 && (
-        <p className="mt-8 text-sm text-zinc-500">Your wishlist is empty.</p>
+        <p className="mt-8 text-sm text-textMain/60">Your wishlist is empty.</p>
       )}
 
       {isAuthenticated && !loading && !error && items.length > 0 && (
@@ -135,7 +135,7 @@ function WishlistContent() {
       <p className="mt-10">
         <Link
           href="/products"
-          className="text-sm font-medium text-zinc-400 underline-offset-4 hover:text-zinc-50 hover:underline"
+          className="text-sm font-medium text-textMain/70 underline-offset-4 hover:text-textMain hover:underline"
         >
           Browse products
         </Link>
@@ -149,7 +149,7 @@ export default function WishlistPage() {
     <Suspense
       fallback={
         <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-          <p className="text-sm text-zinc-500">Loading…</p>
+          <p className="text-sm text-textMain/60">Loading…</p>
         </main>
       }
     >

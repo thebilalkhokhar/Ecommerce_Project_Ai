@@ -90,7 +90,7 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
     <div className="mt-6 flex flex-col gap-4">
       {variants.length > 0 ? (
         <div>
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-textMain/60">
             Select variant
           </p>
           <div className="flex flex-wrap gap-2">
@@ -103,8 +103,8 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
                   onClick={() => setSelectedVariant(v)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
                     sel
-                      ? "border-zinc-300 bg-zinc-800 text-zinc-50"
-                      : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-600"
+                      ? "border-gray-300 bg-gray-200 text-textMain"
+                      : "border-gray-200 bg-gray-50 text-textMain/80 hover:border-gray-300"
                   }`}
                 >
                   {v.name}
@@ -115,14 +115,14 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
         </div>
       ) : null}
 
-      <p className="text-2xl font-medium tabular-nums text-zinc-200">
+      <p className="text-2xl font-medium tabular-nums text-textMain">
         {formatPricePKR(currentPrice)}
       </p>
 
       {currentStock === 0 ? (
-        <p className="text-sm font-medium text-red-400/90">Out of stock</p>
+        <p className="text-sm font-medium text-red-600">Out of stock</p>
       ) : (
-        <p className="text-sm font-medium text-emerald-400/90">
+        <p className="text-sm font-medium text-emerald-700">
           {currentStock} in stock
         </p>
       )}
@@ -142,7 +142,7 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
             });
             toast.success(`${product.name} added to cart!`);
           }}
-          className="w-full max-w-xs rounded-md border border-zinc-700 bg-zinc-50 py-3 text-sm font-medium text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:border-zinc-800 disabled:bg-zinc-900 disabled:text-zinc-600"
+          className="w-full max-w-xs rounded-md bg-primary py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-textMain/50 disabled:opacity-100"
         >
           {currentStock <= 0 ? "Out of stock" : "Add to cart"}
         </button>
@@ -153,7 +153,7 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
           />
         ) : (
           <div
-            className="h-11 w-11 shrink-0 animate-pulse rounded-md border border-zinc-800 bg-zinc-900"
+            className="h-11 w-11 shrink-0 animate-pulse rounded-md border border-gray-200 bg-gray-50"
             aria-hidden
           />
         )}

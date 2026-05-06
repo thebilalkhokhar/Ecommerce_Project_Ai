@@ -50,9 +50,9 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900/40 p-5"
+      className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-5"
     >
-      <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+      <p className="mb-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
         Your rating
       </p>
       <div className="mb-4 flex gap-1" role="group" aria-label="Star rating">
@@ -61,7 +61,7 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
             key={n}
             type="button"
             onClick={() => setRating(n)}
-            className="rounded p-0.5 text-amber-400 transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-zinc-600"
+            className="rounded p-0.5 text-secondary transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/35"
             aria-label={`${n} stars`}
           >
             <Star
@@ -80,12 +80,12 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
         onChange={(e) => setComment(e.target.value)}
         rows={4}
         placeholder="Share your experience…"
-        className="w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+        className="w-full rounded-md border border-gray-200 bg-surface px-3 py-2.5 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
       />
       <button
         type="submit"
         disabled={submitting}
-        className="mt-4 rounded-md border border-zinc-700 bg-zinc-50 px-5 py-2 text-sm font-medium text-zinc-950 transition hover:bg-zinc-200 disabled:opacity-50"
+        className="mt-4 rounded-md bg-primary px-5 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
       >
         {submitting ? "Submitting…" : "Submit review"}
       </button>

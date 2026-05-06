@@ -128,14 +128,14 @@ export function ProductsClient() {
 
   return (
     <main className="mx-auto flex max-w-6xl flex-1 flex-col px-4 py-12">
-      <header className="mb-8 border-b border-zinc-800 pb-8">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-500">
+      <header className="mb-8 border-b border-gray-200 pb-8">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
           ShopOne
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50 md:text-4xl">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-textMain md:text-4xl">
           Our collection
         </h1>
-        <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-400">
+        <p className="mt-2 max-w-lg text-sm leading-relaxed text-textMain/70">
           Curated pieces, minimal presentation. Search and filter by category.
         </p>
       </header>
@@ -144,7 +144,7 @@ export function ProductsClient() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex flex-1">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-textMain/60"
               strokeWidth={1.5}
               aria-hidden
             />
@@ -156,14 +156,14 @@ export function ProductsClient() {
                 if (e.key === "Enter") runSearchNow();
               }}
               placeholder="Search by name…"
-              className="w-full rounded-full border border-zinc-800 bg-zinc-900/50 py-2.5 pl-10 pr-4 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600"
+              className="w-full rounded-full border border-gray-200 bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
               aria-label="Search products"
             />
           </div>
           <button
             type="button"
             onClick={runSearchNow}
-            className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-5 py-2.5 text-xs font-medium tracking-wide text-zinc-100 transition-colors hover:border-zinc-500 hover:bg-zinc-800"
+            className="shrink-0 rounded-full border border-gray-300 bg-gray-50 px-5 py-2.5 text-xs font-medium tracking-wide text-textMain transition-colors hover:border-primary/50 hover:bg-gray-200"
           >
             Search
           </button>
@@ -175,14 +175,14 @@ export function ProductsClient() {
             onClick={() => setSelectedCategoryId(null)}
             className={`rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition-colors ${
               selectedCategoryId === null
-                ? "border-zinc-100 bg-zinc-100 text-zinc-900"
-                : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                ? "border-gray-200 bg-gray-100 text-textMain"
+                : "border-gray-200 bg-gray-50 text-textMain/70 hover:border-gray-300 hover:text-textMain"
             }`}
           >
             All
           </button>
           {categoriesLoading ? (
-            <span className="text-xs text-zinc-600">Loading categories…</span>
+            <span className="text-xs text-textMain/50">Loading categories…</span>
           ) : (
             categories.map((c) => (
               <button
@@ -191,8 +191,8 @@ export function ProductsClient() {
                 onClick={() => setSelectedCategoryId(c.id)}
                 className={`rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition-colors ${
                   selectedCategoryId === c.id
-                    ? "border-zinc-100 bg-zinc-100 text-zinc-900"
-                    : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                    ? "border-gray-200 bg-gray-100 text-textMain"
+                    : "border-gray-200 bg-gray-50 text-textMain/70 hover:border-gray-300 hover:text-textMain"
                 }`}
               >
                 {c.name}
@@ -208,24 +208,24 @@ export function ProductsClient() {
           aria-live="polite"
           aria-busy="true"
         >
-          <div className="h-1 w-24 overflow-hidden rounded-full bg-zinc-800">
-            <div className="h-full w-1/2 animate-pulse rounded-full bg-zinc-500" />
+          <div className="h-1 w-24 overflow-hidden rounded-full bg-gray-200">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-gray-200" />
           </div>
-          <p className="text-sm text-zinc-500">Loading products…</p>
+          <p className="text-sm text-textMain/60">Loading products…</p>
         </div>
       )}
 
       {!loading && error && (
         <div
-          className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-5 py-8 text-center"
+          className="rounded-lg border border-gray-200 bg-gray-100 px-5 py-8 text-center"
           role="alert"
         >
-          <p className="text-sm text-zinc-400">{error}</p>
+          <p className="text-sm text-textMain/70">{error}</p>
         </div>
       )}
 
       {!loading && !error && products.length === 0 && (
-        <p className="py-16 text-center text-sm text-zinc-500">
+        <p className="py-16 text-center text-sm text-textMain/60">
           No products match your filters.
         </p>
       )}
