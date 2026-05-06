@@ -2,6 +2,6 @@
 export const oauthProviderRowClass =
   "flex min-h-[44px] w-full justify-center [&>div]:w-full";
 
-/** Light theme OAuth chips — white surface, subtle border, main text. */
+/** OAuth chips — match login/register outline inputs (primary border, surface). */
 export const oauthButtonClass =
-  "flex h-10 w-[320px] max-w-full shrink-0 items-center justify-center gap-3 rounded border border-gray-200 bg-surface px-3 text-sm font-medium text-textMain shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-50";
+  "flex h-11 w-full shrink-0 items-center justify-center gap-3 rounded-xl border border-primary/15 bg-surface px-4 text-sm font-semibold tracking-wide text-textMain shadow-sm transition-all hover:border-primary/25 hover:bg-primary/5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 disabled:pointer-events-none disabled:opacity-50";
