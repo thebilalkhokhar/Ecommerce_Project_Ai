@@ -14,32 +14,6 @@ from app.schemas.review import (
 )
 
 
-def _user_has_ordered_product(
-    db: Session,
-    user_id: int,
-    product_id: int,
-) -> bool:
-    """True if the user has an order (pending through delivered) that includes this product."""
-    stmt = (
-        select(OrderItem.id)
-        .join(Order, OrderItem.order_id == Order.id)
-        .where(
-            Order.user_id == user_id,
-            OrderItem.product_id == product_id,
-            Order.status.in_(
-                [
-                    OrderStatus.pending,
-                    OrderStatus.processing,
-                    OrderStatus.shipped,
-                    OrderStatus.delivered,
-                ]
-            ),
-        )
-        .limit(1)
-    )
-    return db.scalar(stmt) is not None
-
-
 def _refresh_product_review_stats(db: Session, product_id: int) -> None:
     approved_only = and_(
         Review.product_id == product_id,
@@ -151,6 +125,64 @@ def user_has_reviewed_product(
     return db.scalar(stmt) is not None
 
 
+def _user_has_delivered_product(
+    db: Session,
+    user_id: int,
+    product_id: int,
+) -> bool:
+    stmt = (
+        select(OrderItem.id)
+        .join(Order, OrderItem.order_id == Order.id)
+        .where(
+            Order.user_id == user_id,
+            OrderItem.product_id == product_id,
+            Order.status == OrderStatus.delivered,
+        )
+        .limit(1)
+    )
+    return db.scalar(stmt) is not None
+
+
+def get_pdp_can_review_state(
+    db: Session,
+    user_id: int,
+    product_id: int,
+) -> tuple[bool, str] | None:
+    """
+    Returns None if product does not exist.
+    reason is one of: eligible, already_reviewed, not_delivered, unpurchased.
+    """
+    if db.get(Product, product_id) is None:
+        return None
+
+    if user_has_reviewed_product(db, user_id, product_id):
+        return False, "already_reviewed"
+
+    if _user_has_delivered_product(db, user_id, product_id):
+        return True, "eligible"
+
+    stmt_in_flight = (
+        select(OrderItem.id)
+        .join(Order, OrderItem.order_id == Order.id)
+        .where(
+            Order.user_id == user_id,
+            OrderItem.product_id == product_id,
+            Order.status.in_(
+                [
+                    OrderStatus.pending,
+                    OrderStatus.processing,
+                    OrderStatus.shipped,
+                ]
+            ),
+        )
+        .limit(1)
+    )
+    if db.scalar(stmt_in_flight) is not None:
+        return False, "not_delivered"
+
+    return False, "unpurchased"
+
+
 def create_review(
     db: Session,
     user_id: int,
@@ -167,7 +199,10 @@ def create_review(
     if user_has_reviewed_product(db, user_id, product_id):
         raise ValueError("You have already reviewed this product.")
 
-    verified = _user_has_ordered_product(db, user_id, product_id)
+    if not _user_has_delivered_product(db, user_id, product_id):
+        raise ValueError("Review not eligible")
+
+    verified = True
     review = Review(
         product_id=product_id,
         user_id=user_id,

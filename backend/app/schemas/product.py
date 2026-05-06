@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -39,6 +40,13 @@ class ProductUpdate(BaseModel):
     category_id: int | None = None
     image_url: str | None = None
     variants: list[ProductVariantCreate] | None = None
+
+
+class ProductCanReviewOut(BaseModel):
+    """PDP gate: who may submit a new review for this product."""
+
+    can_review: bool
+    reason: Literal["unpurchased", "not_delivered", "already_reviewed", "eligible"]
 
 
 class ProductOut(BaseModel):

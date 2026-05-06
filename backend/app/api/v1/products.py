@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_admin_user, get_db
+from app.api.deps import get_admin_user, get_current_user, get_db
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductOut, ProductUpdate
-from app.services.crud import crud_product
+from app.schemas.product import (
+    ProductCanReviewOut,
+    ProductCreate,
+    ProductOut,
+    ProductUpdate,
+)
+from app.services.crud import crud_product, crud_review
 from app.utils.cloudinary_client import upload_image
 from app.vector_store.faiss_manager import get_faiss_manager
 
@@ -50,6 +55,25 @@ def get_related_products(
         limit=4,
     )
     return [ProductOut.model_validate(p) for p in related]
+
+
+@router.get(
+    "/{product_id}/can-review",
+    response_model=ProductCanReviewOut,
+)
+def get_product_can_review(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ProductCanReviewOut:
+    state = crud_review.get_pdp_can_review_state(db, current_user.id, product_id)
+    if state is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found",
+        )
+    can_review, reason = state
+    return ProductCanReviewOut(can_review=can_review, reason=reason)
 
 
 @router.get(
