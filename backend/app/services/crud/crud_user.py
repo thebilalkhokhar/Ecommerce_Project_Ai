@@ -72,3 +72,13 @@ def list_customer_users(
         .limit(limit)
     )
     return list(db.scalars(stmt).all())
+
+
+def update_profile(db: Session, user: User, body: UserUpdate) -> User:
+    """Apply partial profile fields from UserUpdate and persist."""
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(user, field, value)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
