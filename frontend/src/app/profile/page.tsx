@@ -129,19 +129,19 @@ export default function ProfilePage() {
 
   if (pageLoading) {
     return (
-      <div className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-4 py-24">
+      <main className="mx-auto flex w-full min-w-0 max-w-5xl flex-1 flex-col items-center justify-center px-4 py-8">
         <Loader2
           className="h-8 w-8 animate-spin text-textMain/60"
           strokeWidth={1.5}
           aria-hidden
         />
         <p className="mt-4 text-sm text-textMain/60">Loading profile…</p>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl flex-1 px-4 py-12">
+    <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-textMain md:text-3xl">
         My Profile
       </h1>
@@ -151,9 +151,9 @@ export default function ProfilePage() {
 
       <form
         onSubmit={handleSubmit}
-        className="mt-10 space-y-6 rounded-xl border border-gray-200 bg-surface p-6 md:p-8"
+        className="mt-10 w-full space-y-6 rounded-xl border border-gray-200 bg-surface p-6 md:p-8"
       >
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid w-full gap-6 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label
               htmlFor="full_name"
@@ -322,6 +322,6 @@ export default function ProfilePage() {
           </button>
         </div>
       </form>
-    </div>
+    </main>
   );
 }
