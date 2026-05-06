@@ -128,17 +128,30 @@ export function ProductsClient() {
 
   return (
     <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col px-4 py-12">
-      <header className="mb-8 border-b border-gray-200 pb-8">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
-          ShopOne
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-textMain md:text-4xl">
-          Our collection
-        </h1>
-        <p className="mt-2 max-w-lg text-sm leading-relaxed text-textMain/70">
-          Curated pieces, minimal presentation. Search and filter by category.
-        </p>
-      </header>
+      <div
+        className="relative mb-8 w-full overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/5 via-surface to-secondary/10 p-8 shadow-sm md:mb-10 md:p-12"
+        role="banner"
+      >
+        <div
+          className="pointer-events-none absolute -right-8 -top-8 h-48 w-48 rounded-full bg-secondary/10 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-12 -left-10 h-56 w-56 rounded-full bg-primary/10 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative z-10">
+          <span className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-primary">
+            ShopOne
+          </span>
+          <h1 className="mb-4 text-3xl font-extrabold tracking-tight text-textMain md:text-5xl">
+            Our collection
+          </h1>
+          <p className="max-w-2xl text-lg leading-relaxed text-textMain/70">
+            Curated pieces, minimal presentation. Search and filter by category.
+          </p>
+        </div>
+      </div>
 
       <div className="mb-10 flex flex-col gap-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
