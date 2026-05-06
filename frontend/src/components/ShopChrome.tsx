@@ -11,20 +11,34 @@ type ShopChromeProps = {
   children: ReactNode;
 };
 
-/** Hides customer Navbar, Footer, and chat when inside `/admin`. */
+/**
+ * Full-width “canvas” routes: no floating navbar, footer, or chat (print-ready
+ * invoice, admin uses its own layout).
+ */
+function isInvoiceCanvasPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname.startsWith("/invoice") ||
+    pathname.includes("/receipt")
+  );
+}
+
+/** Hides customer Navbar, Footer, and chat when inside `/admin` or invoice views. */
 export function ShopChrome({ children }: ShopChromeProps) {
   const pathname = usePathname();
   const isAdminArea = pathname.startsWith("/admin");
+  const invoiceCanvas = isInvoiceCanvasPath(pathname);
+  const showStoreNav = !isAdminArea && !invoiceCanvas;
 
   return (
     <>
-      {!isAdminArea && <Navbar />}
+      {showStoreNav && <Navbar />}
       <div className="print:hidden">
         <AppToaster />
       </div>
       <div className="flex min-h-0 flex-1 flex-col print:bg-white">{children}</div>
-      {!isAdminArea && <Footer />}
-      {!isAdminArea && (
+      {showStoreNav && <Footer />}
+      {showStoreNav && (
         <div className="print:hidden">
           <ChatbotWidget />
         </div>

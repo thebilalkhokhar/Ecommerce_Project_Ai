@@ -188,11 +188,11 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <Link
-                      href={`/orders/${order.id}/receipt`}
+                      href={`/invoice/${order.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex rounded-md border border-gray-300 p-2 text-textMain/70 transition hover:border-primary/50 hover:bg-gray-50 hover:text-textMain"
-                      aria-label={`Print receipt for order ${order.id}`}
+                      aria-label={`Open invoice for order ${order.id}`}
                     >
                       <Printer className="h-4 w-4" strokeWidth={1.75} />
                     </Link>

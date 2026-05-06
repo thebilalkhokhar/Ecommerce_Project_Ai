@@ -209,7 +209,7 @@ function OrdersContent() {
                     View order
                   </Link>
                   <Link
-                    href={`/orders/${order.id}/receipt`}
+                    href={`/invoice/${order.id}`}
                     className="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-textMain transition-colors hover:bg-gray-200"
                   >
                     Receipt 🧾

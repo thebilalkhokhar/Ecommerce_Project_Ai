@@ -526,10 +526,10 @@ function OrderDetailContent() {
                     </div>
                   </dl>
                   <Link
-                    href={`/orders/${order.id}/receipt`}
+                    href={`/invoice/${order.id}`}
                     className="mt-5 inline-flex text-sm font-medium text-primary transition-colors hover:text-primary/90"
                   >
-                    View receipt →
+                    View invoice →
                   </Link>
                 </div>
 
