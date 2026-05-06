@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
+import { completeLoginAndRedirect } from "@/lib/postLoginRedirect";
 import { useAuthStore } from "@/store/authStore";
 import { FacebookLoginButton } from "@/components/FacebookLoginButton";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
@@ -49,7 +50,7 @@ function LoginForm() {
       });
       login(data.access_token);
       toast.success("Signed in with Google.");
-      router.push(nextPath.startsWith("/") ? nextPath : "/products");
+      await completeLoginAndRedirect(router, { customerFallback: nextPath });
     } catch (err: unknown) {
       let msg = "Google sign-in failed.";
       if (axios.isAxiosError(err)) {
@@ -74,7 +75,7 @@ function LoginForm() {
       });
       login(data.access_token);
       toast.success("Signed in with Facebook.");
-      router.push(nextPath.startsWith("/") ? nextPath : "/products");
+      await completeLoginAndRedirect(router, { customerFallback: nextPath });
     } catch (err: unknown) {
       let msg = "Facebook sign-in failed.";
       if (axios.isAxiosError(err)) {
@@ -111,7 +112,7 @@ function LoginForm() {
       });
       login(data.access_token);
       toast.success("Signed in successfully.");
-      router.push(nextPath.startsWith("/") ? nextPath : "/products");
+      await completeLoginAndRedirect(router, { customerFallback: nextPath });
     } catch (err: unknown) {
       let msg = "Invalid email or password.";
 

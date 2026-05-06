@@ -140,7 +140,7 @@ export function Navbar() {
                   </Link>
                 )}
                 {isAuthenticated && user?.is_admin && (
-                  <Link href="/admin" className={linkDesktop}>
+                  <Link href="/admin/dashboard" className={linkDesktop}>
                     <ShieldCheck
                       className="h-4 w-4 opacity-80"
                       strokeWidth={1.75}
@@ -242,7 +242,7 @@ export function Navbar() {
                 )}
                 {isAuthenticated && user?.is_admin && (
                   <Link
-                    href="/admin"
+                    href="/admin/dashboard"
                     className={linkMobile}
                     onClick={closeMobile}
                   >

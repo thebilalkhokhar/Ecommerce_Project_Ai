@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AppToaster } from "@/components/AppToaster";
-import { ChatbotWidget } from "@/components/ChatbotWidget";
 import { GoogleProviders } from "@/components/GoogleProviders";
 import { CartStoreProvider } from "@/components/CartStoreProvider";
 import { WishlistIdsProvider } from "@/components/WishlistIdsProvider";
-import { Footer } from "@/components/layout/Footer";
-import { Navbar } from "@/components/layout/Navbar";
+import { ShopChrome } from "@/components/ShopChrome";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,15 +35,7 @@ export default function RootLayout({
         <GoogleProviders>
           <CartStoreProvider>
             <WishlistIdsProvider>
-              <Navbar />
-              <div className="print:hidden">
-                <AppToaster />
-              </div>
-              <div className="flex min-h-0 flex-1 flex-col print:bg-white">{children}</div>
-              <Footer />
-              <div className="print:hidden">
-                <ChatbotWidget />
-              </div>
+              <ShopChrome>{children}</ShopChrome>
             </WishlistIdsProvider>
           </CartStoreProvider>
         </GoogleProviders>

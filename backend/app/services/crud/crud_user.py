@@ -58,10 +58,17 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     return user
 
 
-def update_profile(db: Session, db_user: User, update_data: UserUpdate) -> User:
-    for key, value in update_data.model_dump(exclude_unset=True).items():
-        setattr(db_user, key, value)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+def list_customer_users(
+    db: Session,
+    *,
+    skip: int = 0,
+    limit: int = 200,
+) -> list[User]:
+    stmt = (
+        select(User)
+        .where(User.is_admin.is_(False))
+        .order_by(User.id.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).all())

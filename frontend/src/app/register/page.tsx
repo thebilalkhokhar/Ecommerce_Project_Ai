@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
+import { completeLoginAndRedirect } from "@/lib/postLoginRedirect";
 import { useAuthStore } from "@/store/authStore";
 import { FacebookLoginButton } from "@/components/FacebookLoginButton";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
@@ -94,7 +95,7 @@ export default function RegisterPage() {
       });
       login(data.access_token);
       toast.success("Signed in with Google.");
-      router.push("/products");
+      await completeLoginAndRedirect(router, { customerFallback: "/products" });
     } catch (err: unknown) {
       let msg = "Google sign-in failed.";
       if (axios.isAxiosError(err)) {
@@ -119,7 +120,7 @@ export default function RegisterPage() {
       });
       login(data.access_token);
       toast.success("Signed in with Facebook.");
-      router.push("/products");
+      await completeLoginAndRedirect(router, { customerFallback: "/products" });
     } catch (err: unknown) {
       let msg = "Facebook sign-in failed.";
       if (axios.isAxiosError(err)) {
