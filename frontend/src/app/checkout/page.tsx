@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { Loader2, ShoppingBag } from "lucide-react";
 import api from "@/lib/axios";
 import { CheckoutPayPalEmbed } from "@/components/CheckoutPayPalEmbed";
 import { useCartStoreHydrated } from "@/components/CartStoreProvider";
@@ -46,6 +47,12 @@ type OrderCreatedResponse = {
   is_cod?: boolean;
   items?: unknown[];
 };
+
+const paymentRadioClass =
+  "flex cursor-pointer items-start gap-3 rounded-2xl border border-primary/15 bg-background p-4 transition-all hover:border-primary/25 has-checked:border-primary/40 has-checked:bg-primary/5 has-checked:shadow-sm";
+
+const paymentRadioInputClass =
+  "mt-1 h-4 w-4 shrink-0 border-primary/25 bg-surface text-primary focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-surface";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -195,42 +202,73 @@ export default function CheckoutPage() {
 
   if (!cartHydrated) {
     return (
-      <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-        <nav className="mb-8 text-sm text-textMain/60">
-          <Link href="/cart" className="hover:text-textMain/80">
+      <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col px-4 py-8">
+        <nav
+          className="mb-8 flex flex-wrap items-center gap-2 text-sm"
+          aria-label="Breadcrumb"
+        >
+          <Link
+            href="/cart"
+            className="rounded-lg px-2 py-1 text-textMain/65 transition-colors hover:bg-primary/5 hover:text-primary"
+          >
             Cart
           </Link>
-          <span className="mx-2 text-textMain/40">/</span>
-          <span className="text-textMain/70">Checkout</span>
+          <span className="text-textMain/35" aria-hidden>
+            /
+          </span>
+          <span className="font-medium text-textMain">Checkout</span>
         </nav>
-        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
+        <h1 className="text-2xl font-semibold tracking-tight text-textMain md:text-3xl">
           Checkout
         </h1>
-        <p className="mt-6 text-sm text-textMain/60">Restoring your cart…</p>
+        <div
+          className="mt-10 flex flex-col items-center justify-center gap-4 rounded-2xl border border-primary/10 bg-surface px-8 py-16 shadow-sm"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <Loader2
+            className="h-8 w-8 animate-spin text-primary"
+            strokeWidth={1.75}
+            aria-hidden
+          />
+          <p className="text-sm text-textMain/60">Restoring your cart…</p>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
-      <nav className="mb-8 text-sm text-textMain/60">
-        <Link href="/cart" className="hover:text-textMain/80">
+    <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-4 py-8">
+      <nav
+        className="mb-8 flex flex-wrap items-center gap-2 text-sm"
+        aria-label="Breadcrumb"
+      >
+        <Link
+          href="/cart"
+          className="rounded-lg px-2 py-1 text-textMain/65 transition-colors hover:bg-primary/5 hover:text-primary"
+        >
           Cart
         </Link>
-        <span className="mx-2 text-textMain/40">/</span>
-        <span className="text-textMain/70">Checkout</span>
+        <span className="text-textMain/35" aria-hidden>
+          /
+        </span>
+        <span className="font-medium text-textMain">Checkout</span>
       </nav>
 
-      <h1 className="text-2xl font-semibold tracking-tight text-textMain">
+      <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+        Secure checkout
+      </span>
+      <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-textMain md:text-3xl">
         Checkout
       </h1>
-      <p className="mt-1 text-sm text-textMain/60">
-        Review your order and choose how you&apos;ll pay.
+      <p className="mt-2 max-w-2xl text-base text-textMain/70">
+        Review your items, confirm payment, and finish your order. You must be
+        signed in to place an order.
       </p>
 
       {checkoutError && (
         <p
-          className="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+          className="mt-6 rounded-2xl border border-red-200/80 bg-red-50 px-5 py-4 text-sm leading-relaxed text-red-800"
           role="alert"
         >
           {checkoutError}
@@ -238,152 +276,170 @@ export default function CheckoutPage() {
       )}
 
       {items.length === 0 ? (
-        <div className="mt-10 rounded-lg border border-gray-200 bg-surface px-6 py-14 text-center">
-          <p className="text-sm text-textMain/70">Your cart is empty.</p>
+        <div className="mt-10 flex w-full flex-col items-center rounded-2xl border border-primary/10 bg-surface px-6 py-16 text-center shadow-sm md:py-20">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShoppingBag className="h-7 w-7" strokeWidth={1.75} aria-hidden />
+          </div>
+          <p className="mt-6 text-base font-medium text-textMain">
+            Your cart is empty
+          </p>
+          <p className="mt-2 max-w-sm text-sm text-textMain/60">
+            Add products before you can check out.
+          </p>
           <Link
             href="/products"
-            className="mt-6 inline-block text-sm font-medium text-textMain underline decoration-textMain/35 underline-offset-4 hover:decoration-primary"
+            className="mt-8 inline-flex items-center justify-center rounded-2xl bg-primary px-8 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
           >
             Continue shopping
           </Link>
         </div>
       ) : (
-        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div className="rounded-lg border border-gray-200 bg-surface">
-              <h2 className="border-b border-gray-200 px-5 py-4 text-sm font-medium uppercase tracking-wider text-textMain/60">
-                Items
-              </h2>
-              <ul className="divide-y divide-gray-200">
-                {items.map((line) => (
-                  <li key={`${line.product.id}::${line.product.variant_name ?? ""}`} className="px-5 py-4">
+        <div className="mt-10 grid w-full min-w-0 grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-10">
+          <div className="min-w-0 lg:col-span-2">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-textMain/50">
+              Items in your order
+            </h2>
+            <ul className="mt-4 flex w-full flex-col gap-4" aria-label="Order items">
+              {items.map((line) => (
+                <li
+                  key={`${line.product.id}::${line.product.variant_name ?? ""}`}
+                  className="min-w-0"
+                >
+                  <div className="rounded-2xl border border-primary/10 bg-surface p-4 shadow-sm sm:p-5">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="font-medium text-textMain">{line.product.name}</p>
-                      <p className="text-sm tabular-nums text-textMain/80">
+                      <p className="text-base font-semibold leading-snug text-textMain">
+                        {line.product.name}
+                      </p>
+                      <p className="text-sm font-medium tabular-nums text-textMain">
                         {formatMoney(line.product.price * line.quantity)}
                       </p>
                     </div>
                     {line.product.variant_name ? (
                       <p className="mt-2">
-                        <span className="inline-block rounded bg-gray-50 px-2 py-1 text-xs text-textMain/70">
+                        <span className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-textMain/80">
                           {line.product.variant_name}
                         </span>
                       </p>
                     ) : null}
-                    <p className="mt-1 text-xs text-textMain/60">
+                    <p className="mt-3 text-xs text-textMain/60">
                       Qty {line.quantity} × {formatMoney(line.product.price)}
                     </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <aside className="lg:col-span-1">
-            <div className="sticky top-4 space-y-6">
-              <div className="rounded-lg border border-gray-200 bg-surface p-6">
-                <h2 className="text-sm font-medium uppercase tracking-wider text-textMain/60">
+          <aside className="min-w-0 lg:col-span-1">
+            <div className="sticky top-24 space-y-6 md:top-28">
+              <div className="rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm md:p-8">
+                <h2 className="text-xs font-semibold uppercase tracking-wider text-textMain/50">
                   Order summary
                 </h2>
                 <dl className="mt-6 space-y-3 text-sm">
-                  <div className="flex justify-between text-textMain/70">
+                  <div className="flex justify-between gap-4 text-textMain/70">
                     <dt>Subtotal</dt>
-                    <dd className="tabular-nums text-textMain">
+                    <dd className="tabular-nums font-medium text-textMain">
                       {formatMoney(subtotal)}
                     </dd>
                   </div>
-                  <div className="flex justify-between text-textMain/70">
+                  <div className="flex justify-between gap-4 text-textMain/70">
                     <dt>Shipping</dt>
-                    <dd className="text-textMain">{shippingLabel}</dd>
+                    <dd className="font-medium text-emerald-700">
+                      {shippingLabel}
+                    </dd>
                   </div>
-                  <div className="flex justify-between border-t border-gray-200 pt-3 text-base font-medium text-textMain">
-                    <dt>Total</dt>
+                  <div className="flex justify-between gap-4 border-t border-primary/10 pt-4 text-base font-semibold text-textMain">
+                    <dt>Estimated total</dt>
                     <dd className="tabular-nums">{formatMoney(orderTotal)}</dd>
                   </div>
                 </dl>
               </div>
 
-              <div className="rounded-lg border border-gray-200 bg-surface p-6">
-                <h2 className="text-lg font-medium text-textMain mb-4">
+              <div className="rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm md:p-8">
+                <h2 className="text-lg font-semibold tracking-tight text-textMain">
                   Payment method
                 </h2>
-                <p className="mb-3 text-xs text-textMain/60">
+                <p className="mt-2 text-xs leading-relaxed text-textMain/60">
                   Totals are in PKR; PayPal Checkout charges in USD using a fixed
                   conversion rate on the server (see{" "}
-                  <code className="text-[11px]">PAYPAL_PKR_PER_USD</code> in the API).
+                  <code className="rounded bg-primary/10 px-1 py-0.5 text-[11px] text-textMain/80">
+                    PAYPAL_PKR_PER_USD
+                  </code>{" "}
+                  in the API).
                 </p>
-                <div className="flex flex-col gap-3">
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
+                <div className="mt-5 flex flex-col gap-3">
+                  <label className={paymentRadioClass}>
                     <input
                       type="radio"
                       name="payment"
                       value="cod"
                       checked={paymentMethod === "cod"}
                       onChange={() => setPaymentMethod("cod")}
-                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
+                      className={paymentRadioInputClass}
                     />
                     <span>
-                      <span className="block text-sm font-medium text-textMain">
+                      <span className="block text-sm font-semibold text-textMain">
                         Cash on Delivery
                       </span>
-                      <span className="mt-0.5 block text-xs text-textMain/70">
+                      <span className="mt-0.5 block text-xs leading-relaxed text-textMain/70">
                         Pay when your order arrives.
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
+                  <label className={paymentRadioClass}>
                     <input
                       type="radio"
                       name="payment"
                       value="stripe"
                       checked={paymentMethod === "stripe"}
                       onChange={() => setPaymentMethod("stripe")}
-                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
+                      className={paymentRadioInputClass}
                     />
                     <span>
-                      <span className="block text-sm font-medium text-textMain">
+                      <span className="block text-sm font-semibold text-textMain">
                         Credit / Debit Card (Stripe)
                       </span>
-                      <span className="mt-0.5 block text-xs text-textMain/70">
+                      <span className="mt-0.5 block text-xs leading-relaxed text-textMain/70">
                         Secure payment via Stripe Checkout.
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
+                  <label className={paymentRadioClass}>
                     <input
                       type="radio"
                       name="payment"
                       value="payflow"
                       checked={paymentMethod === "payflow"}
                       onChange={() => setPaymentMethod("payflow")}
-                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
+                      className={paymentRadioInputClass}
                     />
                     <span>
-                      <span className="block text-sm font-medium text-textMain">
+                      <span className="block text-sm font-semibold text-textMain">
                         Credit Card (Payflow)
                       </span>
-                      <span className="mt-0.5 block text-xs text-textMain/70">
+                      <span className="mt-0.5 block text-xs leading-relaxed text-textMain/70">
                         PayPal Payflow Pro — card processed on our servers.
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
+                  <label className={paymentRadioClass}>
                     <input
                       type="radio"
                       name="payment"
                       value="paypal"
                       checked={paymentMethod === "paypal"}
                       onChange={() => setPaymentMethod("paypal")}
-                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
+                      className={paymentRadioInputClass}
                     />
                     <span>
-                      <span className="block text-sm font-medium text-textMain">
+                      <span className="block text-sm font-semibold text-textMain">
                         PayPal
                       </span>
-                      <span className="mt-0.5 block text-xs text-textMain/70">
+                      <span className="mt-0.5 block text-xs leading-relaxed text-textMain/70">
                         Pay with your PayPal account or card (checkout in USD).
                       </span>
                     </span>
@@ -391,15 +447,15 @@ export default function CheckoutPage() {
                 </div>
 
                 {payflowSelected && (
-                  <div className="mt-5 space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-xs text-textMain/60">
-                      Enter your card details exactly as shown on the card. Expiry as
-                      MMYY (e.g. 1226).
+                  <div className="mt-5 space-y-4 rounded-2xl border border-primary/15 bg-background/80 p-4 md:p-5">
+                    <p className="text-xs leading-relaxed text-textMain/60">
+                      Enter your card details exactly as shown on the card. Expiry
+                      as MMYY (e.g. 1226).
                     </p>
                     <div>
                       <label
                         htmlFor="payflow-card"
-                        className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
+                        className="block text-xs font-medium uppercase tracking-wider text-textMain/55"
                       >
                         Card number
                       </label>
@@ -411,7 +467,7 @@ export default function CheckoutPage() {
                         maxLength={23}
                         value={payflowCard}
                         onChange={(e) => setPayflowCard(e.target.value)}
-                        className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
+                        className="mt-1.5 w-full rounded-xl border border-primary/15 bg-surface px-3 py-2.5 text-sm text-textMain shadow-sm transition-all placeholder:text-textMain/40 focus:border-primary/30 focus:outline-none focus:ring-4 focus:ring-primary/10"
                         placeholder="0000 0000 0000 0000"
                       />
                     </div>
@@ -419,7 +475,7 @@ export default function CheckoutPage() {
                       <div>
                         <label
                           htmlFor="payflow-exp"
-                          className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
+                          className="block text-xs font-medium uppercase tracking-wider text-textMain/55"
                         >
                           Expiry (MMYY)
                         </label>
@@ -431,16 +487,18 @@ export default function CheckoutPage() {
                           maxLength={4}
                           value={payflowExpiry}
                           onChange={(e) =>
-                            setPayflowExpiry(e.target.value.replace(/\D/g, "").slice(0, 4))
+                            setPayflowExpiry(
+                              e.target.value.replace(/\D/g, "").slice(0, 4),
+                            )
                           }
-                          className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
+                          className="mt-1.5 w-full rounded-xl border border-primary/15 bg-surface px-3 py-2.5 text-sm text-textMain shadow-sm transition-all placeholder:text-textMain/40 focus:border-primary/30 focus:outline-none focus:ring-4 focus:ring-primary/10"
                           placeholder="MMYY"
                         />
                       </div>
                       <div>
                         <label
                           htmlFor="payflow-cvv"
-                          className="block text-xs font-medium uppercase tracking-wider text-textMain/60"
+                          className="block text-xs font-medium uppercase tracking-wider text-textMain/55"
                         >
                           CVV
                         </label>
@@ -452,9 +510,11 @@ export default function CheckoutPage() {
                           maxLength={4}
                           value={payflowCvv}
                           onChange={(e) =>
-                            setPayflowCvv(e.target.value.replace(/\D/g, "").slice(0, 4))
+                            setPayflowCvv(
+                              e.target.value.replace(/\D/g, "").slice(0, 4),
+                            )
                           }
-                          className="mt-1.5 w-full rounded-md border border-gray-300 bg-surface px-3 py-2 text-sm text-textMain placeholder:text-textMain/50 focus:border-primary focus:outline-none focus:ring-0"
+                          className="mt-1.5 w-full rounded-xl border border-primary/15 bg-surface px-3 py-2.5 text-sm text-textMain shadow-sm transition-all placeholder:text-textMain/40 focus:border-primary/30 focus:outline-none focus:ring-4 focus:ring-primary/10"
                           placeholder="•••"
                         />
                       </div>
@@ -463,8 +523,8 @@ export default function CheckoutPage() {
                 )}
 
                 {paymentMethod === "paypal" && paypalCheckoutOrderId !== null && (
-                  <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <p className="mb-3 text-xs font-medium text-textMain/70">
+                  <div className="mt-5 rounded-2xl border border-primary/15 bg-background/80 p-4 md:p-5">
+                    <p className="mb-3 text-xs font-semibold text-textMain/70">
                       Complete payment with PayPal
                     </p>
                     <CheckoutPayPalEmbed orderId={paypalCheckoutOrderId} />
@@ -480,7 +540,7 @@ export default function CheckoutPage() {
                   (paymentMethod === "paypal" && paypalCheckoutOrderId !== null)
                 }
                 onClick={() => void handlePlaceOrder()}
-                className="w-full rounded-md bg-primary py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                className="w-full rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-md transition-all hover:opacity-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100"
               >
                 {submitting
                   ? paymentMethod === "stripe"
@@ -502,10 +562,17 @@ export default function CheckoutPage() {
               </button>
 
               {!isAuthenticated && items.length > 0 && (
-                <p className="text-center text-xs text-textMain/60">
+                <p className="text-center text-xs leading-relaxed text-textMain/55">
                   You&apos;ll be asked to sign in when you place the order.
                 </p>
               )}
+
+              <Link
+                href="/cart"
+                className="block w-full rounded-2xl border border-primary/20 bg-primary/5 py-3 text-center text-sm font-medium text-textMain transition-all hover:border-primary/30 hover:bg-primary/10 active:scale-[0.98]"
+              >
+                Back to cart
+              </Link>
             </div>
           </aside>
         </div>
