@@ -1,9 +1,38 @@
 from langchain_core.tools import tool
+from sqlalchemy import func, select
 
 from app.db.session import SessionLocal
 from app.models.order import Order
+from app.models.user import User
+from app.services.ai.chat_context import chat_authenticated_user_id
 from app.services.crud import crud_product
 from app.vector_store.faiss_manager import get_faiss_manager
+
+MSG_AUTH_NOT_IN_ACCOUNT = "I could not find an order with this ID in your account."
+MSG_GUEST_COMBO_NOT_FOUND = (
+    "No order found with this combination of Order ID and Email."
+)
+MSG_GUEST_NEED_EMAIL = (
+    "To look up a guest order, I need both the order number and the email address "
+    "used when the order was placed. Please share both."
+)
+
+
+def _format_order_reply(order_id: int, order: Order) -> str:
+    created = order.created_at
+    if created is not None:
+        created_str = created.isoformat(timespec="minutes")
+    else:
+        created_str = "an unknown date"
+    status_val = (
+        order.status.value
+        if hasattr(order.status, "value")
+        else str(order.status)
+    )
+    return (
+        f"Order #{order_id} was placed on {created_str} "
+        f"and its current status is: {status_val}."
+    )
 
 
 @tool
@@ -37,26 +66,39 @@ def search_store_inventory(query: str) -> str:
 
 
 @tool
-def check_order_status(order_id: int) -> str:
-    """Fetches the current status of a customer's order using their Order ID."""
+def check_order_status(order_id: int, customer_email: str | None = None) -> str:
+    """Look up order status by order ID.
+
+    Logged-in shoppers: only `order_id` is needed; the account is taken from the session.
+
+    Guests (not logged in): you MUST have both `order_id` and `customer_email` (the email on
+    the account that placed the order) before calling; never call with only `order_id` for a guest.
+    """
     db = SessionLocal()
     try:
-        order = db.get(Order, order_id)
+        uid = chat_authenticated_user_id.get()
+        if uid is not None:
+            order = db.scalar(
+                select(Order).where(Order.id == order_id, Order.user_id == uid),
+            )
+            if order is None:
+                return MSG_AUTH_NOT_IN_ACCOUNT
+            return _format_order_reply(order_id, order)
+
+        if not customer_email or not str(customer_email).strip():
+            return MSG_GUEST_NEED_EMAIL
+
+        email_norm = str(customer_email).strip().lower()
+        order = db.scalar(
+            select(Order)
+            .join(User, Order.user_id == User.id)
+            .where(
+                Order.id == order_id,
+                func.lower(User.email) == email_norm,
+            ),
+        )
         if order is None:
-            return f"Order #{order_id} not found. Please check the order number."
-        created = order.created_at
-        if created is not None:
-            created_str = created.isoformat(timespec="minutes")
-        else:
-            created_str = "an unknown date"
-        status_val = (
-            order.status.value
-            if hasattr(order.status, "value")
-            else str(order.status)
-        )
-        return (
-            f"Order #{order_id} was placed on {created_str} "
-            f"and its current status is: {status_val}."
-        )
+            return MSG_GUEST_COMBO_NOT_FOUND
+        return _format_order_reply(order_id, order)
     finally:
         db.close()
