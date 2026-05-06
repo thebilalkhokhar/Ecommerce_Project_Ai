@@ -40,8 +40,8 @@ export function ProductCard({ product }: ProductCardProps) {
     typeof product.image_url === "string" && product.image_url.length > 0;
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-surface shadow-md">
-      <div className="relative aspect-square w-full overflow-hidden border-b border-gray-100 bg-gray-50">
+    <article className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-surface shadow-md">
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden border-b border-gray-100 bg-gray-50">
         <Link
           href={`/products/${product.id}`}
           className="relative block h-full w-full outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -55,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
               className="object-cover"
             />
           ) : (
-            <div className="flex h-full min-h-48 w-full items-center justify-center">
+            <div className="flex h-full min-h-[12rem] w-full items-center justify-center">
               <ImageIcon
                 className="h-10 w-10 text-textMain/40"
                 strokeWidth={1.25}
@@ -75,36 +75,35 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div className="space-y-1">
-          <h3 className="text-[15px] font-semibold leading-snug tracking-tight text-textMain">
-            <Link
-              href={`/products/${product.id}`}
-              className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-            >
-              {product.name}
-            </Link>
-          </h3>
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-textMain">
+          <Link
+            href={`/products/${product.id}`}
+            className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          >
+            {product.name}
+          </Link>
+        </h3>
+        <div className="mt-auto flex flex-col gap-3 pt-3">
           <p className="text-sm tabular-nums tracking-wide text-textMain/70">
             {formatPrice(product.price)}
           </p>
+          <button
+            type="button"
+            disabled={outOfStock}
+            onClick={() => {
+              addItem({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+              });
+              toast.success(`${product.name} added to cart!`);
+            }}
+            className="w-full rounded-md bg-primary py-2.5 text-xs font-medium tracking-wide text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-textMain/50 disabled:opacity-100 disabled:hover:opacity-100"
+          >
+            {outOfStock ? "Out of stock" : "Add to cart"}
+          </button>
         </div>
-
-        <button
-          type="button"
-          disabled={outOfStock}
-          onClick={() => {
-            addItem({
-              id: product.id,
-              name: product.name,
-              price: product.price,
-            });
-            toast.success(`${product.name} added to cart!`);
-          }}
-          className="mt-auto w-full rounded-md bg-primary py-2.5 text-xs font-medium tracking-wide text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-textMain/50 disabled:opacity-100 disabled:hover:opacity-100"
-        >
-          {outOfStock ? "Out of stock" : "Add to cart"}
-        </button>
       </div>
     </article>
   );

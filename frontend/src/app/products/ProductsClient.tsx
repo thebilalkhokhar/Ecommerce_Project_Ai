@@ -127,7 +127,7 @@ export function ProductsClient() {
   };
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-1 flex-col px-4 py-12">
+    <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col px-4 py-12">
       <header className="mb-8 border-b border-gray-200 pb-8">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
           ShopOne
@@ -231,13 +231,15 @@ export function ProductsClient() {
       )}
 
       {!loading && !error && products.length > 0 && (
-        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
-            <li key={product.id}>
-              <ProductCard product={product} />
-            </li>
-          ))}
-        </ul>
+        <div className="w-full min-w-0 flex-1">
+          <ul className="grid w-full min-w-0 grid-cols-1 items-stretch gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <li key={product.id} className="flex h-full min-h-0">
+                <ProductCard product={product} />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </main>
   );

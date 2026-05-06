@@ -115,7 +115,7 @@ function WishlistContent() {
       )}
 
       {isAuthenticated && !loading && !error && items.length > 0 && (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-8 grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {items.map((row) => {
             const p = row.product;
             const priceNum =
@@ -123,19 +123,20 @@ function WishlistContent() {
                 ? p.price
                 : Number.parseFloat(String(p.price));
             return (
-              <ProductCard
-                key={row.id}
-                product={{
-                  id: p.id,
-                  name: p.name,
-                  price: Number.isFinite(priceNum) ? priceNum : 0,
-                  stock_quantity: p.stock_quantity,
-                  image_url: p.image_url,
-                }}
-              />
+              <li key={row.id} className="flex h-full min-h-0">
+                <ProductCard
+                  product={{
+                    id: p.id,
+                    name: p.name,
+                    price: Number.isFinite(priceNum) ? priceNum : 0,
+                    stock_quantity: p.stock_quantity,
+                    image_url: p.image_url,
+                  }}
+                />
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
 
       <p className="mt-10">

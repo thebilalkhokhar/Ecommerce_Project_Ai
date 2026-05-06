@@ -3,7 +3,7 @@ import { ProductsClient } from "./ProductsClient";
 
 function ProductsFallback() {
   return (
-    <main className="mx-auto flex max-w-6xl flex-1 flex-col px-4 py-12">
+    <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col px-4 py-12">
       <div
         className="flex flex-1 flex-col items-center justify-center gap-4 py-24"
         aria-live="polite"
