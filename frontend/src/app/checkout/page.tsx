@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { Loader2, ShoppingBag } from "lucide-react";
 import api from "@/lib/axios";
+import { CartLineThumbnail } from "@/components/cart/CartLineThumbnail";
 import { CheckoutPayPalEmbed } from "@/components/CheckoutPayPalEmbed";
 import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore } from "@/store/authStore";
@@ -306,24 +307,33 @@ export default function CheckoutPage() {
                   className="min-w-0"
                 >
                   <div className="rounded-2xl border border-primary/10 bg-surface p-4 shadow-sm sm:p-5">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-base font-semibold leading-snug text-textMain">
-                        {line.product.name}
-                      </p>
-                      <p className="text-sm font-medium tabular-nums text-textMain">
-                        {formatMoney(line.product.price * line.quantity)}
-                      </p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+                      <CartLineThumbnail
+                        productId={line.product.id}
+                        name={line.product.name}
+                        imageUrl={line.product.image_url}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <p className="text-base font-semibold leading-snug text-textMain">
+                            {line.product.name}
+                          </p>
+                          <p className="shrink-0 text-sm font-medium tabular-nums text-textMain">
+                            {formatMoney(line.product.price * line.quantity)}
+                          </p>
+                        </div>
+                        {line.product.variant_name ? (
+                          <p className="mt-2">
+                            <span className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-textMain/80">
+                              {line.product.variant_name}
+                            </span>
+                          </p>
+                        ) : null}
+                        <p className="mt-3 text-xs text-textMain/60">
+                          Qty {line.quantity} × {formatMoney(line.product.price)}
+                        </p>
+                      </div>
                     </div>
-                    {line.product.variant_name ? (
-                      <p className="mt-2">
-                        <span className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-textMain/80">
-                          {line.product.variant_name}
-                        </span>
-                      </p>
-                    ) : null}
-                    <p className="mt-3 text-xs text-textMain/60">
-                      Qty {line.quantity} × {formatMoney(line.product.price)}
-                    </p>
                   </div>
                 </li>
               ))}

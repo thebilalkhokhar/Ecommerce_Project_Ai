@@ -98,6 +98,7 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
               id: product.id,
               name: product.name,
               price: currentPrice,
+              image_url: product.image_url,
               ...(selectedVariant?.name
                 ? { variant_name: selectedVariant.name }
                 : {}),

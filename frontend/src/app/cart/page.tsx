@@ -3,6 +3,7 @@
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Loader2, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { CartLineThumbnail } from "@/components/cart/CartLineThumbnail";
 import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore, type CartItem } from "@/store/cartStore";
@@ -103,86 +104,96 @@ export default function CartPage() {
               {items.map((line) => (
                 <li key={cartLineKey(line)} className="min-w-0">
                   <div className="rounded-2xl border border-primary/10 bg-surface p-4 shadow-sm transition-shadow hover:border-primary/15 hover:shadow-md sm:p-5">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-base font-semibold leading-snug text-textMain">
-                          {line.product.name}
-                        </p>
-                        {line.product.variant_name ? (
-                          <p className="mt-2">
-                            <span className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-textMain/80">
-                              {line.product.variant_name}
-                            </span>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+                      <CartLineThumbnail
+                        productId={line.product.id}
+                        name={line.product.name}
+                        imageUrl={line.product.image_url}
+                      />
+                      <div className="flex min-w-0 flex-1 flex-col gap-4">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-base font-semibold leading-snug text-textMain">
+                            {line.product.name}
                           </p>
-                        ) : null}
-                        <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
-                          <span className="tabular-nums text-textMain/70">
-                            {formatMoney(line.product.price)} each
-                          </span>
-                          <span className="text-textMain/40" aria-hidden>
-                            ·
-                          </span>
-                          <span className="font-medium tabular-nums text-textMain">
-                            Line: {formatMoney(lineTotal(line))}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex shrink-0 flex-wrap items-center gap-3 sm:flex-col sm:items-end md:flex-row md:items-center">
-                        <div className="flex items-center overflow-hidden rounded-2xl border border-primary/15 bg-background shadow-sm">
-                          <button
-                            type="button"
-                            aria-label="Decrease quantity"
-                            onClick={() =>
-                              updateQuantity(
-                                line.product.id,
-                                line.quantity - 1,
-                                line.product.variant_name,
-                              )
-                            }
-                            className="p-2.5 text-textMain/70 transition-colors hover:bg-primary/5 hover:text-textMain active:scale-95"
-                          >
-                            <Minus className="h-4 w-4" strokeWidth={2} />
-                          </button>
-                          <span className="min-w-10 px-1 text-center text-sm font-medium tabular-nums text-textMain">
-                            {line.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            aria-label="Increase quantity"
-                            onClick={() =>
-                              updateQuantity(
-                                line.product.id,
-                                line.quantity + 1,
-                                line.product.variant_name,
-                              )
-                            }
-                            className="p-2.5 text-textMain/70 transition-colors hover:bg-primary/5 hover:text-textMain active:scale-95"
-                          >
-                            <Plus className="h-4 w-4" strokeWidth={2} />
-                          </button>
+                          {line.product.variant_name ? (
+                            <p className="mt-2">
+                              <span className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-textMain/80">
+                                {line.product.variant_name}
+                              </span>
+                            </p>
+                          ) : null}
+                          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+                            <span className="tabular-nums text-textMain/70">
+                              {formatMoney(line.product.price)} each
+                            </span>
+                            <span className="text-textMain/40" aria-hidden>
+                              ·
+                            </span>
+                            <span className="font-medium tabular-nums text-textMain">
+                              Line: {formatMoney(lineTotal(line))}
+                            </span>
+                          </div>
                         </div>
 
-                        <button
-                          type="button"
-                          aria-label={`Remove ${line.product.name}`}
-                          onClick={() => {
-                            removeItem(
-                              line.product.id,
-                              line.product.variant_name,
-                            );
-                            const v = line.product.variant_name;
-                            toast.success(
-                              v
-                                ? `${line.product.name} (${v}) removed from cart`
-                                : `${line.product.name} removed from cart`,
-                            );
-                          }}
-                          className="inline-flex items-center gap-2 rounded-2xl border border-transparent px-3 py-2 text-sm font-medium text-textMain/60 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-700 active:scale-95"
-                        >
-                          <Trash2 className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                          <span className="hidden sm:inline">Remove</span>
-                        </button>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <div className="flex items-center overflow-hidden rounded-2xl border border-primary/15 bg-background shadow-sm">
+                            <button
+                              type="button"
+                              aria-label="Decrease quantity"
+                              onClick={() =>
+                                updateQuantity(
+                                  line.product.id,
+                                  line.quantity - 1,
+                                  line.product.variant_name,
+                                )
+                              }
+                              className="p-2.5 text-textMain/70 transition-colors hover:bg-primary/5 hover:text-textMain active:scale-95"
+                            >
+                              <Minus className="h-4 w-4" strokeWidth={2} />
+                            </button>
+                            <span className="min-w-10 px-1 text-center text-sm font-medium tabular-nums text-textMain">
+                              {line.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              aria-label="Increase quantity"
+                              onClick={() =>
+                                updateQuantity(
+                                  line.product.id,
+                                  line.quantity + 1,
+                                  line.product.variant_name,
+                                )
+                              }
+                              className="p-2.5 text-textMain/70 transition-colors hover:bg-primary/5 hover:text-textMain active:scale-95"
+                            >
+                              <Plus className="h-4 w-4" strokeWidth={2} />
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            aria-label={`Remove ${line.product.name}`}
+                            onClick={() => {
+                              removeItem(
+                                line.product.id,
+                                line.product.variant_name,
+                              );
+                              const v = line.product.variant_name;
+                              toast.success(
+                                v
+                                  ? `${line.product.name} (${v}) removed from cart`
+                                  : `${line.product.name} removed from cart`,
+                              );
+                            }}
+                            className="inline-flex items-center gap-2 rounded-2xl border border-transparent px-3 py-2 text-sm font-medium text-textMain/60 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-700 active:scale-95"
+                          >
+                            <Trash2
+                              className="h-4 w-4 shrink-0"
+                              strokeWidth={1.75}
+                            />
+                            <span className="hidden sm:inline">Remove</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

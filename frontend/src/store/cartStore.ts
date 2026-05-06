@@ -7,6 +7,8 @@ export type CartProduct = {
   name: string;
   price: number;
   variant_name?: string;
+  /** Product photo URL when available (shown in cart / checkout). */
+  image_url?: string | null;
 };
 
 export type CartLine = {
@@ -73,7 +75,17 @@ export const useCartStore = create<CartState>()(
           if (existing) {
             items = state.items.map((i) =>
               lineMatches(i, product.id, product.variant_name)
-                ? { ...i, quantity: i.quantity + 1 }
+                ? {
+                    ...i,
+                    quantity: i.quantity + 1,
+                    product: {
+                      ...i.product,
+                      image_url:
+                        product.image_url != null && String(product.image_url).trim() !== ""
+                          ? product.image_url
+                          : i.product.image_url,
+                    },
+                  }
                 : i,
             );
           } else {
