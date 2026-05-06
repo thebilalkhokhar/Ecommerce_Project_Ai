@@ -153,11 +153,11 @@ export function ProductsClient() {
         </div>
       </div>
 
-      <div className="mb-10 flex flex-col gap-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex flex-1">
+      <div className="mb-10 w-full">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="relative w-full max-w-2xl">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-textMain/60"
+              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-textMain/40"
               strokeWidth={1.5}
               aria-hidden
             />
@@ -169,43 +169,45 @@ export function ProductsClient() {
                 if (e.key === "Enter") runSearchNow();
               }}
               placeholder="Search by name…"
-              className="w-full rounded-full border border-gray-200 bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-textMain placeholder:text-textMain/50 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+              className="w-full rounded-2xl border border-transparent bg-surface py-3.5 pl-12 pr-4 text-textMain shadow-sm transition-all placeholder:text-textMain/40 focus:border-primary/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
               aria-label="Search products"
             />
           </div>
           <button
             type="button"
             onClick={runSearchNow}
-            className="shrink-0 rounded-full border border-gray-300 bg-gray-50 px-5 py-2.5 text-xs font-medium tracking-wide text-textMain transition-colors hover:border-primary/50 hover:bg-gray-200"
+            className="shrink-0 cursor-pointer rounded-2xl border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-medium text-textMain shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 active:scale-95"
           >
             Search
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="scrollbar-hide mt-6 flex w-full flex-nowrap items-center gap-3 overflow-x-auto pb-1 md:mt-8 md:flex-wrap md:overflow-x-visible md:pb-0">
           <button
             type="button"
             onClick={() => setSelectedCategoryId(null)}
-            className={`rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition-colors ${
+            className={`cursor-pointer rounded-full px-5 py-2.5 text-sm shadow-sm transition-all active:scale-95 ${
               selectedCategoryId === null
-                ? "border-gray-200 bg-gray-100 text-textMain"
-                : "border-gray-200 bg-gray-50 text-textMain/70 hover:border-gray-300 hover:text-textMain"
+                ? "bg-primary font-semibold text-white shadow-md"
+                : "border border-transparent bg-surface font-medium text-textMain hover:border-primary/20 hover:bg-primary/5"
             }`}
           >
             All
           </button>
           {categoriesLoading ? (
-            <span className="text-xs text-textMain/50">Loading categories…</span>
+            <span className="shrink-0 text-sm text-textMain/50">
+              Loading categories…
+            </span>
           ) : (
             categories.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => setSelectedCategoryId(c.id)}
-                className={`rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition-colors ${
+                className={`shrink-0 cursor-pointer rounded-full px-5 py-2.5 text-sm shadow-sm transition-all active:scale-95 ${
                   selectedCategoryId === c.id
-                    ? "border-gray-200 bg-gray-100 text-textMain"
-                    : "border-gray-200 bg-gray-50 text-textMain/70 hover:border-gray-300 hover:text-textMain"
+                    ? "bg-primary font-semibold text-white shadow-md"
+                    : "border border-transparent bg-surface font-medium text-textMain hover:border-primary/20 hover:bg-primary/5"
                 }`}
               >
                 {c.name}
