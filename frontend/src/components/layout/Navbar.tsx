@@ -14,12 +14,17 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useCartStore, selectItemUnitCount } from "@/store/cartStore";
+import {
+  useCartStore,
+  selectItemUnitCount,
+} from "@/store/cartStore";
+import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore, type AuthUser } from "@/store/authStore";
 import api from "@/lib/axios";
 
 export function Navbar() {
   const itemCount = useCartStore(selectItemUnitCount);
+  const cartHydrated = useCartStoreHydrated();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
@@ -157,11 +162,11 @@ export function Navbar() {
                 <Link
                   href="/cart"
                   className={`${iconBtn} relative text-textMain`}
-                  aria-label={`Cart, ${itemCount} items`}
+                  aria-label={`Cart, ${cartHydrated ? itemCount : 0} items`}
                 >
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.75} />
-                  {itemCount > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-medium text-textMain">
+                  {cartHydrated && itemCount > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-medium text-textMain transition-opacity duration-150">
                       {itemCount > 99 ? "99+" : itemCount}
                     </span>
                   )}

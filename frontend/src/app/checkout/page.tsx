@@ -6,6 +6,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
+import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore, type CartItem } from "@/store/cartStore";
 
@@ -51,6 +52,7 @@ export default function CheckoutPage() {
   const totalPrice = useCartStore((s) => s.totalPrice);
   const clearCart = useCartStore((s) => s.clearCart);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const cartHydrated = useCartStoreHydrated();
 
   const [submitting, setSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
@@ -167,6 +169,24 @@ export default function CheckoutPage() {
   }
 
   const payflowSelected = paymentMethod === "payflow";
+
+  if (!cartHydrated) {
+    return (
+      <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
+        <nav className="mb-8 text-sm text-textMain/60">
+          <Link href="/cart" className="hover:text-textMain/80">
+            Cart
+          </Link>
+          <span className="mx-2 text-textMain/40">/</span>
+          <span className="text-textMain/70">Checkout</span>
+        </nav>
+        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
+          Checkout
+        </h1>
+        <p className="mt-6 text-sm text-textMain/60">Restoring your cart…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">

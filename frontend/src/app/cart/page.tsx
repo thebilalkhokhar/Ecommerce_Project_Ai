@@ -3,6 +3,7 @@
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore, type CartItem } from "@/store/cartStore";
 
@@ -25,10 +26,22 @@ export default function CartPage() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const cartHydrated = useCartStoreHydrated();
 
   const subtotal = totalPrice;
   const shippingLabel = "Free";
   const orderTotal = subtotal;
+
+  if (!cartHydrated) {
+    return (
+      <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
+        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
+          Cart
+        </h1>
+        <p className="mt-6 text-sm text-textMain/60">Restoring your cart…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-6xl flex-1 px-4 py-12">
@@ -157,7 +170,7 @@ export default function CartPage() {
 
             {items.length === 0 ? (
               <span
-                className="mt-6 block w-full cursor-not-allowed rounded-md border border-gray-200 bg-gray-50 py-3 text-center text-sm font-medium text-textMain/50 opacity-50"
+                className=" mt-6 block w-full cursor-not-allowed rounded-md border border-gray-200 bg-gray-50 px-6 py-3 text-center text-sm font-medium text-textMain/50 opacity-50"
                 aria-disabled
               >
                 Proceed to checkout
@@ -165,7 +178,7 @@ export default function CartPage() {
             ) : (
               <Link
                 href="/checkout"
-                className="mt-6 block w-full rounded-md bg-primary py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
+                className="mt-6 block w-full rounded-md bg-primary px-6 py-3 text-center text-sm font-medium text-white transition hover:opacity-90"
               >
                 Proceed to checkout
               </Link>
