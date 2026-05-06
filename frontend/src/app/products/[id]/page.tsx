@@ -124,7 +124,7 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      <ProductReviews productId={product.id} />
+      <ProductReviews key={product.id} productId={product.id} />
 
       <section className="mt-16 border-t border-gray-200 bg-surface p-8 rounded-lg">
         <RelatedProducts productId={product.id} />

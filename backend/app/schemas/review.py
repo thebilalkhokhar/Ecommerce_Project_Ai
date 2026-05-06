@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, Field
+from __future__ import annotations
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ReviewCreate(BaseModel):
@@ -22,9 +24,26 @@ class ReviewOut(BaseModel):
     comment: str
     admin_reply: str | None
     is_verified_purchase: bool
+    is_approved: bool
+    image_urls: list[str] = Field(default_factory=list)
     user: ReviewUserSnippet
     likes_count: int = 0
     dislikes_count: int = 0
+
+
+class AdminReviewListOut(ReviewOut):
+    product_name: str
+
+
+class AdminReviewUpdate(BaseModel):
+    is_approved: bool | None = None
+    admin_reply: str | None = Field(None, max_length=8000)
+
+    @model_validator(mode="after")
+    def at_least_one_field(self) -> AdminReviewUpdate:
+        if self.is_approved is None and self.admin_reply is None:
+            raise ValueError("Provide is_approved and/or admin_reply")
+        return self
 
 
 class ReactionCreate(BaseModel):

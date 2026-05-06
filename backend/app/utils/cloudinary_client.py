@@ -12,11 +12,11 @@ def configure_cloudinary() -> None:
     )
 
 
-def upload_image(file_bytes: bytes) -> str:
+def upload_image(file_bytes: bytes, *, folder: str = "ecommerce/products") -> str:
     configure_cloudinary()
     result = cloudinary.uploader.upload(
         file_bytes,
         resource_type="image",
-        folder="ecommerce/products",
+        folder=folder,
     )
     return str(result["secure_url"])

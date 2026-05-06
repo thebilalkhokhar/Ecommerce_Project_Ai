@@ -7,7 +7,11 @@ from app.models.order import Order, OrderStatus
 from app.models.order_item import OrderItem
 from app.models.product import Product
 from app.models.review import Review, ReviewReaction
-from app.schemas.review import ReviewCreate, ReviewOut, ReviewUserSnippet
+from app.schemas.review import (
+    AdminReviewListOut,
+    ReviewOut,
+    ReviewUserSnippet,
+)
 
 
 def _user_has_ordered_product(
@@ -37,12 +41,12 @@ def _user_has_ordered_product(
 
 
 def _refresh_product_review_stats(db: Session, product_id: int) -> None:
-    avg_val = db.scalar(
-        select(func.avg(Review.rating)).where(Review.product_id == product_id),
+    approved_only = and_(
+        Review.product_id == product_id,
+        Review.is_approved.is_(True),
     )
-    cnt = db.scalar(
-        select(func.count(Review.id)).where(Review.product_id == product_id),
-    )
+    avg_val = db.scalar(select(func.avg(Review.rating)).where(approved_only))
+    cnt = db.scalar(select(func.count(Review.id)).where(approved_only))
     product = db.get(Product, product_id)
     if product is None:
         return
@@ -78,17 +82,26 @@ def _reaction_counts_bulk(
     return out
 
 
-def _to_review_out(db: Session, review: Review) -> ReviewOut:
+def _normalize_image_urls(raw: object) -> list[str]:
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        return []
+    return [str(u) for u in raw if u]
+
+
+def _build_review_out(
+    db: Session,
+    review: Review,
+    counts: dict[int, dict[bool, int]],
+) -> ReviewOut:
     if review.user is None:
         review = db.scalars(
             select(Review)
             .options(selectinload(Review.user))
             .where(Review.id == review.id),
         ).one()
-    c = _reaction_counts_bulk(db, [review.id]).get(
-        review.id,
-        {True: 0, False: 0},
-    )
+    c = counts.get(review.id, {True: 0, False: 0})
     return ReviewOut(
         id=review.id,
         product_id=review.product_id,
@@ -97,17 +110,42 @@ def _to_review_out(db: Session, review: Review) -> ReviewOut:
         comment=review.comment,
         admin_reply=review.admin_reply,
         is_verified_purchase=review.is_verified_purchase,
+        is_approved=review.is_approved,
+        image_urls=_normalize_image_urls(review.image_urls),
         user=ReviewUserSnippet(name=review.user.full_name),
         likes_count=c[True],
         dislikes_count=c[False],
     )
 
 
+def _to_review_out(db: Session, review: Review) -> ReviewOut:
+    c = _reaction_counts_bulk(db, [review.id])
+    return _build_review_out(db, review, c)
+
+
+def _to_admin_review_list_out(
+    db: Session,
+    review: Review,
+    counts: dict[int, dict[bool, int]],
+) -> AdminReviewListOut:
+    base = _build_review_out(db, review, counts)
+    product_name = ""
+    if review.product is not None:
+        product_name = review.product.name
+    elif review.product_id:
+        p = db.get(Product, review.product_id)
+        product_name = p.name if p else ""
+    return AdminReviewListOut(**base.model_dump(), product_name=product_name)
+
+
 def create_review(
     db: Session,
     user_id: int,
     product_id: int,
-    review_in: ReviewCreate,
+    *,
+    rating: int,
+    comment: str,
+    image_urls: list[str] | None = None,
 ) -> Review:
     product = db.get(Product, product_id)
     if product is None:
@@ -117,9 +155,11 @@ def create_review(
     review = Review(
         product_id=product_id,
         user_id=user_id,
-        rating=review_in.rating,
-        comment=review_in.comment,
+        rating=rating,
+        comment=comment,
         is_verified_purchase=verified,
+        is_approved=False,
+        image_urls=list(image_urls or []),
     )
     db.add(review)
     db.commit()
@@ -142,6 +182,49 @@ def add_admin_reply(db: Session, review_id: int, reply_text: str) -> Review | No
     return review
 
 
+def admin_update_review(
+    db: Session,
+    review_id: int,
+    *,
+    is_approved: bool | None = None,
+    admin_reply: str | None = None,
+) -> Review | None:
+    review = db.get(Review, review_id)
+    if review is None:
+        return None
+    if is_approved is not None:
+        review.is_approved = is_approved
+    if admin_reply is not None:
+        review.admin_reply = admin_reply
+    db.add(review)
+    db.commit()
+    pid = review.product_id
+    _refresh_product_review_stats(db, pid)
+    return db.scalars(
+        select(Review)
+        .options(selectinload(Review.user), selectinload(Review.product))
+        .where(Review.id == review_id),
+    ).one()
+
+
+def list_all_reviews_admin(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+) -> list[AdminReviewListOut]:
+    stmt = (
+        select(Review)
+        .options(selectinload(Review.user), selectinload(Review.product))
+        .order_by(Review.id.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    reviews = list(db.scalars(stmt).all())
+    ids = [r.id for r in reviews]
+    counts = _reaction_counts_bulk(db, ids)
+    return [_to_admin_review_list_out(db, r, counts) for r in reviews]
+
+
 def toggle_reaction(
     db: Session,
     user_id: int,
@@ -154,6 +237,8 @@ def toggle_reaction(
     """
     review = db.get(Review, review_id)
     if review is None:
+        raise ValueError("Review not found")
+    if not review.is_approved:
         raise ValueError("Review not found")
 
     stmt = select(ReviewReaction).where(
@@ -199,7 +284,10 @@ def list_reviews_for_product(
     stmt = (
         select(Review)
         .options(selectinload(Review.user))
-        .where(Review.product_id == product_id)
+        .where(
+            Review.product_id == product_id,
+            Review.is_approved.is_(True),
+        )
         .order_by(Review.id.desc())
         .offset(skip)
         .limit(limit)
@@ -208,25 +296,13 @@ def list_reviews_for_product(
     ids = [r.id for r in reviews]
     counts = _reaction_counts_bulk(db, ids)
 
-    result: list[ReviewOut] = []
-    for r in reviews:
-        c = counts.get(r.id, {True: 0, False: 0})
-        result.append(
-            ReviewOut(
-                id=r.id,
-                product_id=r.product_id,
-                user_id=r.user_id,
-                rating=r.rating,
-                comment=r.comment,
-                admin_reply=r.admin_reply,
-                is_verified_purchase=r.is_verified_purchase,
-                user=ReviewUserSnippet(name=r.user.full_name),
-                likes_count=c[True],
-                dislikes_count=c[False],
-            ),
-        )
-    return result
+    return [_build_review_out(db, r, counts) for r in reviews]
 
 
 def review_to_out(db: Session, review: Review) -> ReviewOut:
     return _to_review_out(db, review)
+
+
+def admin_review_to_list_out(db: Session, review: Review) -> AdminReviewListOut:
+    counts = _reaction_counts_bulk(db, [review.id])
+    return _to_admin_review_list_out(db, review, counts)

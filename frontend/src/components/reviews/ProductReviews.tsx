@@ -16,6 +16,7 @@ export type ReviewItem = {
   comment: string;
   admin_reply: string | null;
   is_verified_purchase: boolean;
+  image_urls?: string[];
   user: { name: string };
   likes_count: number;
   dislikes_count: number;
@@ -39,6 +40,16 @@ function StarRow({ rating }: { rating: number }) {
   );
 }
 
+async function fetchProductReviews(
+  productId: number,
+): Promise<ReviewItem[]> {
+  const { data } = await api.get<ReviewItem[]>(
+    `/products/${productId}/reviews`,
+    { params: { limit: 100 } },
+  );
+  return Array.isArray(data) ? data : [];
+}
+
 type ProductReviewsProps = {
   productId: number;
 };
@@ -50,14 +61,31 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
   const [reactingId, setReactingId] = useState<number | null>(null);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await fetchProductReviews(productId);
+        if (!cancelled) setReviews(list);
+      } catch {
+        if (!cancelled) {
+          toast.error("Could not load reviews.");
+          setReviews([]);
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
+
   const loadReviews = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await api.get<ReviewItem[]>(
-        `/products/${productId}/reviews`,
-        { params: { limit: 100 } },
-      );
-      setReviews(Array.isArray(data) ? data : []);
+      const list = await fetchProductReviews(productId);
+      setReviews(list);
     } catch {
       toast.error("Could not load reviews.");
       setReviews([]);
@@ -65,10 +93,6 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       setIsLoading(false);
     }
   }, [productId]);
-
-  useEffect(() => {
-    void loadReviews();
-  }, [loadReviews]);
 
   async function handleHelpful(reviewId: number) {
     if (!isAuthenticated) {
@@ -130,6 +154,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
         <ul className="space-y-4">
           {reviews.map((r) => {
             const displayName = r.user?.name?.trim() || "Anonymous";
+            const images = Array.isArray(r.image_urls) ? r.image_urls : [];
             return (
               <li
                 key={r.id}
@@ -153,12 +178,33 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                 <p className="mt-3 text-sm leading-relaxed text-textMain/80">
                   {r.comment}
                 </p>
+                {images.length > 0 ? (
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {images.map((url) => (
+                      <li key={url}>
+                        <button
+                          type="button"
+                          onClick={() => window.open(url, "_blank", "noopener,noreferrer")}
+                          className="block overflow-hidden rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/35"
+                          aria-label="Open review photo in new tab"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={url}
+                            alt=""
+                            className="h-16 w-16 object-cover"
+                          />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 {r.admin_reply ? (
-                  <div className="mt-3 border-l-2 border-primary/40 bg-gray-50 p-3 text-sm text-textMain/70">
-                    <p className="text-xs font-medium uppercase tracking-wider text-textMain/60">
-                      Store
-                    </p>
-                    <p className="mt-1">{r.admin_reply}</p>
+                  <div className="mt-3 ml-0.5 border-l-4 border-primary/45 bg-[#F4F4F8] py-3 pl-4 pr-3 text-sm text-textMain/85">
+                    <span className="inline-block rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                      Store Owner
+                    </span>
+                    <p className="mt-2 leading-relaxed">{r.admin_reply}</p>
                   </div>
                 ) : null}
                 <div className="mt-3 flex items-center gap-3 border-t border-gray-200 pt-3">

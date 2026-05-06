@@ -1,12 +1,27 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Annotated
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_admin_user, get_current_user, get_db
 from app.models.user import User
-from app.schemas.review import AdminReplyBody, ReactionCreate, ReviewCreate, ReviewOut
+from app.schemas.review import AdminReplyBody, ReactionCreate, ReviewOut
 from app.services.crud import crud_review
+from app.utils.cloudinary_client import upload_image
 
 router = APIRouter(tags=["Reviews"])
+
+MAX_REVIEW_IMAGES = 5
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
 
 @router.post(
@@ -14,14 +29,51 @@ router = APIRouter(tags=["Reviews"])
     response_model=ReviewOut,
     status_code=status.HTTP_201_CREATED,
 )
-def create_product_review(
+async def create_product_review(
     product_id: int,
-    body: ReviewCreate,
+    rating: Annotated[int, Form(..., ge=1, le=5)],
+    comment: Annotated[str, Form(...)],
+    images: list[UploadFile] | None = File(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> ReviewOut:
+    image_urls: list[str] = []
+    if images:
+        for uf in images[:MAX_REVIEW_IMAGES]:
+            if uf is None or not uf.filename:
+                continue
+            raw = await uf.read()
+            if not raw:
+                continue
+            if len(raw) > MAX_IMAGE_BYTES:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Each image must be at most {MAX_IMAGE_BYTES // (1024 * 1024)} MB",
+                )
+            ctype = (uf.content_type or "").lower()
+            if ctype and not ctype.startswith("image/"):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Only image uploads are allowed",
+                )
+            try:
+                url = upload_image(raw, folder="ecommerce/reviews")
+            except Exception as exc:  # noqa: BLE001 — surface as 502
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Could not store images",
+                ) from exc
+            image_urls.append(url)
+
     try:
-        review = crud_review.create_review(db, current_user.id, product_id, body)
+        review = crud_review.create_review(
+            db,
+            current_user.id,
+            product_id,
+            rating=rating,
+            comment=comment.strip(),
+            image_urls=image_urls or None,
+        )
     except ValueError as exc:
         if str(exc) == "Product not found":
             raise HTTPException(

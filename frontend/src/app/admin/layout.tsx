@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   LayoutGrid,
   LogOut,
+  MessageSquare,
   Package,
   ShoppingBag,
   Users,
@@ -23,6 +24,7 @@ const NAV: readonly { href: string; label: string; icon: typeof LayoutDashboard 
     { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/categories", label: "Categories", icon: LayoutGrid },
+    { href: "/admin/reviews", label: "Reviews", icon: MessageSquare },
   ];
 
 function navItemClass(active: boolean) {
