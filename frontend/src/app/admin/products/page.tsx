@@ -49,6 +49,12 @@ function formatMoney(amount: string | number): string {
   }).format(Number.isFinite(n) ? n : 0);
 }
 
+const inputClass =
+  "w-full rounded-xl border border-primary/15 bg-background px-3 py-2.5 text-sm text-textMain shadow-sm transition focus:border-primary/30 focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10";
+
+const labelClass =
+  "mb-1.5 block text-xs font-semibold uppercase tracking-wider text-textMain/55";
+
 export default function AdminProductsPage() {
   const formSectionRef = useRef<HTMLElement>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -277,30 +283,38 @@ export default function AdminProductsPage() {
   const isEditing = editingProduct != null;
 
   return (
-    <div>
-      <header className="mb-8 border-b border-gray-200 pb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-textMain">
+    <div className="space-y-10 pb-4">
+      <header className="rounded-2xl border border-primary/10 bg-surface px-5 py-6 shadow-sm md:px-7 md:py-8">
+        <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+          Catalog
+        </span>
+        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-textMain md:text-3xl">
           Products
         </h1>
-        <p className="mt-1 text-sm text-textMain/60">
-          Add, edit, or remove catalog items and images.
+        <p className="mt-2 max-w-2xl text-sm text-textMain/70">
+          Create and maintain catalog items, upload images, and manage variants.
+          Changes apply to the storefront immediately.
         </p>
       </header>
 
-      <section ref={formSectionRef} className="mb-12">
-        <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
-          {isEditing ? "Edit Product" : "Add New Product"}
-        </h2>
+      <section ref={formSectionRef} className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-textMain/50">
+            {isEditing ? "Edit product" : "Add product"}
+          </h2>
+          {isEditing ? (
+            <span className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+              Editing #{editingProduct.id}
+            </span>
+          ) : null}
+        </div>
         <form
           onSubmit={handleSubmit}
-          className="grid gap-6 rounded-lg border border-gray-200 bg-gray-50 p-6 md:grid-cols-2"
+          className="grid gap-6 rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm md:grid-cols-2 md:p-8"
         >
           <div className="space-y-4 md:col-span-2 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
             <div className="md:col-span-2">
-              <label
-                htmlFor="p-name"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
+              <label htmlFor="p-name" className={labelClass}>
                 Name
               </label>
               <input
@@ -309,29 +323,23 @@ export default function AdminProductsPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                className={inputClass}
               />
             </div>
             <div className="md:col-span-2">
-              <label
-                htmlFor="p-desc"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
-                Description <span className="text-textMain/50">(optional)</span>
+              <label htmlFor="p-desc" className={labelClass}>
+                Description <span className="font-normal normal-case text-textMain/45">(optional)</span>
               </label>
               <textarea
                 id="p-desc"
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full resize-y rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                className={`${inputClass} resize-y`}
               />
             </div>
             <div>
-              <label
-                htmlFor="p-price"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
+              <label htmlFor="p-price" className={labelClass}>
                 Price (PKR)
               </label>
               <input
@@ -342,14 +350,11 @@ export default function AdminProductsPage() {
                 step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                className={inputClass}
               />
             </div>
             <div>
-              <label
-                htmlFor="p-stock"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
+              <label htmlFor="p-stock" className={labelClass}>
                 Stock quantity
               </label>
               <input
@@ -360,21 +365,18 @@ export default function AdminProductsPage() {
                 step={1}
                 value={stock_quantity}
                 onChange={(e) => setStockQuantity(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                className={inputClass}
               />
             </div>
             <div>
-              <label
-                htmlFor="p-category"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
+              <label htmlFor="p-category" className={labelClass}>
                 Category
               </label>
               <select
                 id="p-category"
                 value={category_id}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                className={inputClass}
               >
                 <option value="">None</option>
                 {categories.map((c) => (
@@ -385,11 +387,8 @@ export default function AdminProductsPage() {
               </select>
             </div>
             <div>
-              <label
-                htmlFor="product-image"
-                className="mb-1.5 block text-xs font-medium text-textMain/60"
-              >
-                Image <span className="text-textMain/50">(optional)</span>
+              <label htmlFor="product-image" className={labelClass}>
+                Image <span className="font-normal normal-case text-textMain/45">(optional)</span>
               </label>
               <input
                 id="product-image"
@@ -399,15 +398,15 @@ export default function AdminProductsPage() {
                   const f = e.target.files?.[0];
                   setImageFile(f ?? null);
                 }}
-                className="w-full text-sm text-textMain/70 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-gray-50 file:px-3 file:py-2 file:text-xs file:font-medium file:text-textMain"
+                className="w-full text-sm text-textMain/70 file:mr-3 file:cursor-pointer file:rounded-xl file:border file:border-primary/20 file:bg-primary/5 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-textMain file:transition-colors hover:file:border-primary/35 hover:file:bg-primary/10"
               />
             </div>
           </div>
 
           <div className="md:col-span-2">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-xs font-medium uppercase tracking-[0.15em] text-textMain/60">
-                Product variants (optional)
+              <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-textMain/50">
+                Variants (optional)
               </h3>
               <button
                 type="button"
@@ -417,26 +416,26 @@ export default function AdminProductsPage() {
                     { name: "", price_adjustment: 0, stock_quantity: 0 },
                   ])
                 }
-                className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-gray-50 px-3 py-1.5 text-xs font-medium text-textMain transition hover:border-primary/50 hover:bg-gray-200"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-semibold text-textMain transition hover:border-primary/30 hover:bg-primary/10 active:scale-[0.98]"
               >
                 <Plus className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
                 Add variant
               </button>
             </div>
-            <div className="space-y-3 rounded-md border border-gray-200 bg-surface/95 p-4">
+            <div className="space-y-3 rounded-2xl border border-primary/10 bg-background/60 p-4 md:p-5">
               {variants.length === 0 ? (
-                <p className="text-xs text-textMain/50">
-                  No variants. Add rows for options like size or configuration; stock
-                  and price adjustment apply per variant at checkout.
+                <p className="text-xs leading-relaxed text-textMain/55">
+                  No variants. Add rows for options like size or color; stock and
+                  price adjustment apply per variant at checkout.
                 </p>
               ) : (
                 variants.map((row, index) => (
                   <div
                     key={index}
-                    className="flex flex-col gap-3 rounded-md border border-gray-200/80 bg-gray-50 p-3 sm:flex-row sm:flex-wrap sm:items-end"
+                    className="flex flex-col gap-3 rounded-xl border border-primary/10 bg-surface p-3 sm:flex-row sm:flex-wrap sm:items-end"
                   >
                     <div className="min-w-0 flex-1 sm:min-w-[140px]">
-                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-textMain/60">
+                      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-textMain/50">
                         Name
                       </label>
                       <input
@@ -451,11 +450,11 @@ export default function AdminProductsPage() {
                             ),
                           );
                         }}
-                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                        className={inputClass}
                       />
                     </div>
                     <div className="w-full sm:w-28">
-                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-textMain/60">
+                      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-textMain/50">
                         Price ±
                       </label>
                       <input
@@ -477,11 +476,11 @@ export default function AdminProductsPage() {
                             ),
                           );
                         }}
-                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                        className={inputClass}
                       />
                     </div>
                     <div className="w-full sm:w-24">
-                      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-textMain/60">
+                      <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-textMain/50">
                         Stock
                       </label>
                       <input
@@ -504,7 +503,7 @@ export default function AdminProductsPage() {
                             ),
                           );
                         }}
-                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-textMain focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/35"
+                        className={inputClass}
                       />
                     </div>
                     <button
@@ -512,7 +511,7 @@ export default function AdminProductsPage() {
                       onClick={() =>
                         setVariants((prev) => prev.filter((_, i) => i !== index))
                       }
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 text-textMain/60 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/15 text-textMain/60 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95"
                       aria-label="Remove variant"
                     >
                       <Trash2 className="h-4 w-4" strokeWidth={1.5} />
@@ -526,7 +525,7 @@ export default function AdminProductsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[180px] sm:px-8"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55 disabled:active:scale-100 sm:w-auto sm:min-w-[180px] sm:px-8"
             >
               {isSubmitting ? (
                 <>
@@ -543,7 +542,7 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={() => resetForm()}
-                className="rounded-md border border-gray-300 bg-gray-50 px-5 py-3 text-sm font-medium text-textMain transition hover:border-primary/50 hover:bg-gray-200"
+                className="rounded-xl border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-textMain transition hover:border-primary/30 hover:bg-primary/10 active:scale-[0.98]"
               >
                 Cancel
               </button>
@@ -552,108 +551,123 @@ export default function AdminProductsPage() {
         </form>
       </section>
 
-      <section>
-        <h2 className="mb-4 text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
-          Catalog
-        </h2>
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-textMain/50">
+            All products
+          </h2>
+          <p className="text-xs text-textMain/50">
+            {listLoading ? "…" : `${products.length} in catalog`}
+          </p>
+        </div>
         {listLoading ? (
-          <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-6 py-10">
-            <Loader2 className="h-5 w-5 animate-spin text-textMain/60" />
-            <span className="text-sm text-textMain/60">Loading products…</span>
+          <div className="flex items-center gap-4 rounded-2xl border border-dashed border-primary/20 bg-primary/5 px-6 py-12">
+            <Loader2 className="h-6 w-6 shrink-0 animate-spin text-primary" />
+            <div>
+              <p className="text-sm font-medium text-textMain">Loading catalog…</p>
+              <p className="mt-0.5 text-xs text-textMain/55">
+                Fetching products and categories
+              </p>
+            </div>
           </div>
         ) : products.length === 0 ? (
-          <p className="rounded-lg border border-gray-200 border-dashed bg-gray-50 px-6 py-10 text-center text-sm text-textMain/60">
-            No products yet.
+          <p className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-6 py-14 text-center text-sm font-medium text-textMain/70">
+            No products yet. Use the form above to create your first item.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="w-full min-w-[800px] border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-100">
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Image
-                  </th>
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Name
-                  </th>
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Price
-                  </th>
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Stock
-                  </th>
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Category
-                  </th>
-                  <th className="px-3 py-3 text-xs font-medium uppercase tracking-wider text-textMain/60">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {products.map((p) => {
-                  const hasImg =
-                    typeof p.image_url === "string" && p.image_url.length > 0;
-                  return (
-                    <tr key={p.id} className="bg-surface/95">
-                      <td className="px-3 py-2">
-                        <div className="relative h-12 w-12 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
-                          {hasImg ? (
-                            <Image
-                              src={p.image_url!}
-                              alt={p.name}
-                              fill
-                              sizes="48px"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <ImageIcon
-                                className="h-5 w-5 text-textMain/50"
-                                strokeWidth={1.25}
-                                aria-hidden
+          <div className="overflow-hidden rounded-2xl border border-primary/10 shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-primary/10 bg-primary/5">
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Image
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Name
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Price
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Stock
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Category
+                    </th>
+                    <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-textMain/55">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-primary/10 bg-surface">
+                  {products.map((p) => {
+                    const hasImg =
+                      typeof p.image_url === "string" && p.image_url.length > 0;
+                    return (
+                      <tr
+                        key={p.id}
+                        className="transition-colors hover:bg-primary/4"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-primary/10 bg-background">
+                            {hasImg ? (
+                              <Image
+                                src={p.image_url!}
+                                alt={p.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
                               />
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="max-w-[200px] px-3 py-2 font-medium text-textMain">
-                        {p.name}
-                      </td>
-                      <td className="px-3 py-2 tabular-nums text-textMain/80">
-                        {formatMoney(p.price)}
-                      </td>
-                      <td className="px-3 py-2 tabular-nums text-textMain/70">
-                        {p.stock_quantity}
-                      </td>
-                      <td className="px-3 py-2 text-textMain/70">
-                        {p.category?.name ?? "—"}
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(p)}
-                            className="rounded-md p-2 text-textMain/70 transition hover:bg-gray-200 hover:text-textMain"
-                            aria-label={`Edit ${p.name}`}
-                          >
-                            <Pencil className="h-4 w-4" strokeWidth={1.5} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleDelete(p.id)}
-                            className="rounded-md p-2 text-textMain/70 transition hover:bg-gray-200 hover:text-red-400"
-                            aria-label={`Delete ${p.name}`}
-                          >
-                            <Trash2 className="h-4 w-4" strokeWidth={1.5} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center">
+                                <ImageIcon
+                                  className="h-5 w-5 text-textMain/40"
+                                  strokeWidth={1.25}
+                                  aria-hidden
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="max-w-[200px] px-4 py-3 font-semibold text-textMain">
+                          {p.name}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-textMain/80">
+                          {formatMoney(p.price)}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-textMain/70">
+                          {p.stock_quantity}
+                        </td>
+                        <td className="px-4 py-3 text-textMain/65">
+                          {p.category?.name ?? "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(p)}
+                              className="rounded-xl p-2 text-textMain/65 transition hover:bg-primary/10 hover:text-primary"
+                              aria-label={`Edit ${p.name}`}
+                            >
+                              <Pencil className="h-4 w-4" strokeWidth={1.5} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDelete(p.id)}
+                              className="rounded-xl p-2 text-textMain/65 transition hover:bg-red-50 hover:text-red-600"
+                              aria-label={`Delete ${p.name}`}
+                            >
+                              <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </section>
