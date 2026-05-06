@@ -134,8 +134,24 @@ def get_order_by_id(db: Session, order_id: int) -> Order | None:
     return db.scalars(stmt).unique().first()
 
 
-def serialize_order_out(order: Order):
+def serialize_order_out(
+    order: Order,
+    db: Session,
+    reviewing_user_id: int | None = None,
+):
+    from app.models.review import Review
     from app.schemas.order import OrderItemOut, OrderOut, OrderUserOut
+
+    product_ids = list({it.product_id for it in order.items})
+    reviewed_ids: set[int] = set()
+    if reviewing_user_id is not None and product_ids:
+        rows = db.scalars(
+            select(Review.product_id).where(
+                Review.user_id == reviewing_user_id,
+                Review.product_id.in_(product_ids),
+            ),
+        ).all()
+        reviewed_ids = {int(pid) for pid in rows}
 
     items = [
         OrderItemOut(
@@ -149,6 +165,7 @@ def serialize_order_out(order: Order):
             product_image_url=(
                 it.product.image_url if it.product is not None else None
             ),
+            has_reviewed=it.product_id in reviewed_ids,
         )
         for it in order.items
     ]

@@ -138,6 +138,19 @@ def _to_admin_review_list_out(
     return AdminReviewListOut(**base.model_dump(), product_name=product_name)
 
 
+def user_has_reviewed_product(
+    db: Session,
+    user_id: int,
+    product_id: int,
+) -> bool:
+    stmt = (
+        select(Review.id)
+        .where(Review.user_id == user_id, Review.product_id == product_id)
+        .limit(1)
+    )
+    return db.scalar(stmt) is not None
+
+
 def create_review(
     db: Session,
     user_id: int,
@@ -150,6 +163,9 @@ def create_review(
     product = db.get(Product, product_id)
     if product is None:
         raise ValueError("Product not found")
+
+    if user_has_reviewed_product(db, user_id, product_id):
+        raise ValueError("You have already reviewed this product.")
 
     verified = _user_has_ordered_product(db, user_id, product_id)
     review = Review(

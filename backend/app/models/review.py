@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 class Review(Base):
     __table_args__ = (
         CheckConstraint("rating >= 1 AND rating <= 5", name="ck_review_rating_range"),
+        UniqueConstraint("user_id", "product_id", name="uq_review_user_product"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)

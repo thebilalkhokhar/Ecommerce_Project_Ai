@@ -28,6 +28,7 @@ class OrderItemOut(BaseModel):
     variant_name: str | None = None
     product_name: str | None = None
     product_image_url: str | None = None
+    has_reviewed: bool = False
 
 
 class OrderUserOut(BaseModel):

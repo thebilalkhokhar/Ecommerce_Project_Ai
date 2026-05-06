@@ -10,6 +10,7 @@ from fastapi import (
     UploadFile,
     status,
 )
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_admin_user, get_current_user, get_db
@@ -75,12 +76,24 @@ async def create_product_review(
             image_urls=image_urls or None,
         )
     except ValueError as exc:
-        if str(exc) == "Product not found":
+        msg = str(exc)
+        if msg == "Product not found":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Product not found",
             ) from exc
+        if msg == "You have already reviewed this product.":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You have already reviewed this product.",
+            ) from exc
         raise
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have already reviewed this product.",
+        ) from exc
     return crud_review.review_to_out(db, review)
 
 

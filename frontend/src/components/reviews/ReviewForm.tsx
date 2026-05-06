@@ -6,6 +6,17 @@ import axios from "axios";
 import { Star } from "lucide-react";
 import api from "@/lib/axios";
 
+function fastApiErrorDetail(data: unknown): string | null {
+  if (!data || typeof data !== "object") return null;
+  const detail = (data as { detail?: unknown }).detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && detail.length > 0) {
+    const row = detail[0] as { msg?: unknown };
+    if (typeof row?.msg === "string") return row.msg;
+  }
+  return null;
+}
+
 type ReviewFormProps = {
   productId: number;
   onSuccess: () => void | Promise<void>;
@@ -50,8 +61,9 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 401) {
           msg = "Please log in to post a review.";
-        } else if (typeof err.response?.data?.detail === "string") {
-          msg = err.response.data.detail;
+        } else {
+          const fromApi = fastApiErrorDetail(err.response?.data);
+          if (fromApi) msg = fromApi;
         }
       }
       toast.error(msg);

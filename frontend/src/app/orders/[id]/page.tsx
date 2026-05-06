@@ -23,6 +23,7 @@ type OrderItemRow = {
   variant_name?: string | null;
   product_name?: string | null;
   product_image_url?: string | null;
+  has_reviewed?: boolean;
 };
 
 type OrderUserRow = {
@@ -93,7 +94,7 @@ function formatStatusLabel(status: string): string {
 
 function canWriteReviewForOrder(status: string): boolean {
   const s = normalizeOrderStatus(status);
-  return s === "delivered" || s === "shipped";
+  return s === "delivered";
 }
 
 /** Normalize API status (string or rare object shape) for comparisons. */
@@ -117,7 +118,7 @@ function getReviewLockReason(statusUnknown: unknown): string {
     return "Reviews are not available for cancelled orders.";
   }
   const label = formatStatusLabel(String(statusUnknown));
-  return `Write a review becomes available when your order is shipped or delivered. Current status: ${label}.`;
+  return `Write a review becomes available when your order is delivered. Current status: ${label}.`;
 }
 
 function OrderDetailContent() {
@@ -137,6 +138,16 @@ function OrderDetailContent() {
   const [reviewProductId, setReviewProductId] = useState<number | null>(null);
 
   const closeReviewModal = useCallback(() => setReviewProductId(null), []);
+
+  const refreshOrder = useCallback(async () => {
+    if (!orderId) return;
+    try {
+      const { data } = await api.get<OrderDetailData>(`/orders/${orderId}`);
+      setOrder(data);
+    } catch {
+      /* keep existing order snapshot */
+    }
+  }, [orderId]);
 
   useEffect(() => {
     useAuthStore.getState().initAuth();
@@ -288,6 +299,7 @@ function OrderDetailContent() {
                 productId={reviewProductId}
                 onSuccess={async () => {
                   closeReviewModal();
+                  await refreshOrder();
                 }}
               />
             </div>
@@ -459,7 +471,14 @@ function OrderDetailContent() {
                               ) : null}
                             </div>
                           </div>
-                          {showReviewCta ? (
+                          {it.has_reviewed ? (
+                            <span
+                              className="inline-flex shrink-0 items-center rounded-lg border border-emerald-200/90 bg-emerald-50 px-3 py-2 text-xs font-semibold text-green-700"
+                              aria-label="You already reviewed this product"
+                            >
+                              ✓ Reviewed
+                            </span>
+                          ) : showReviewCta ? (
                             <button
                               type="button"
                               onClick={() =>

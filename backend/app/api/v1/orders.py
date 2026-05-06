@@ -28,7 +28,7 @@ def checkout(
         list(order.items),
     )
     email_service.send_admin_new_order_alert(order.id, float(order.total_price))
-    return crud_order.serialize_order_out(order)
+    return crud_order.serialize_order_out(order, db, current_user.id)
 
 
 @router.get("", response_model=list[OrderOut])
@@ -37,7 +37,7 @@ def list_my_orders(
     current_user: User = Depends(get_current_user),
 ) -> list[OrderOut]:
     orders = crud_order.get_user_orders(db, current_user.id)
-    return [crud_order.serialize_order_out(o) for o in orders]
+    return [crud_order.serialize_order_out(o, db, current_user.id) for o in orders]
 
 
 @router.get("/all", response_model=list[OrderOut])
@@ -48,7 +48,7 @@ def admin_list_all_orders(
     limit: int = Query(100, ge=1, le=500),
 ) -> list[OrderOut]:
     orders = crud_order.get_all_orders(db, skip=skip, limit=limit)
-    return [crud_order.serialize_order_out(o) for o in orders]
+    return [crud_order.serialize_order_out(o, db, o.user_id) for o in orders]
 
 
 @router.get("/{order_id}", response_model=OrderOut)
@@ -68,7 +68,8 @@ def get_order_detail(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to view this order",
         )
-    return crud_order.serialize_order_out(order)
+    review_user_id = order.user_id if current_user.is_admin else current_user.id
+    return crud_order.serialize_order_out(order, db, review_user_id)
 
 
 @router.patch("/{order_id}/status", response_model=OrderOut)
@@ -85,4 +86,4 @@ def admin_update_order_status(
             order.id,
             order.status.value,
         )
-    return crud_order.serialize_order_out(order)
+    return crud_order.serialize_order_out(order, db, order.user_id)
