@@ -146,10 +146,26 @@ def serialize_order_out(order: Order):
             unit_price=it.unit_price,
             variant_name=it.variant_name,
             product_name=it.product.name if it.product is not None else None,
+            product_image_url=(
+                it.product.image_url if it.product is not None else None
+            ),
         )
         for it in order.items
     ]
-    user_out = OrderUserOut.model_validate(order.user) if order.user else None
+    user_out = None
+    if order.user is not None:
+        u = order.user
+        user_out = OrderUserOut(
+            id=u.id,
+            email=u.email,
+            full_name=u.full_name,
+            phone_number=u.phone_number,
+            address_line_1=u.address_line_1,
+            address_line_2=u.address_line_2,
+            city=u.city,
+            state=u.state,
+            postal_code=u.postal_code,
+        )
     return OrderOut(
         id=order.id,
         user_id=order.user_id,

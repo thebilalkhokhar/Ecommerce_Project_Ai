@@ -27,6 +27,7 @@ class OrderItemOut(BaseModel):
     unit_price: Decimal
     variant_name: str | None = None
     product_name: str | None = None
+    product_image_url: str | None = None
 
 
 class OrderUserOut(BaseModel):
@@ -35,6 +36,12 @@ class OrderUserOut(BaseModel):
     id: int
     email: str
     full_name: str | None = None
+    phone_number: str | None = None
+    address_line_1: str | None = None
+    address_line_2: str | None = None
+    city: str | None = None
+    state: str | None = None
+    postal_code: str | None = None
 
 
 class OrderOut(BaseModel):
