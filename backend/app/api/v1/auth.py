@@ -9,7 +9,7 @@ from google.oauth2 import id_token
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
 from app.core import security
 from app.core.config import settings
 from app.models.user import User
@@ -95,6 +95,14 @@ def login(
         access_token=access_token,
         refresh_token=refresh_token,
     )
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    crud_refresh_token.revoke_all_for_user(db, current_user.id)
 
 
 @router.post("/google-login", response_model=Token)

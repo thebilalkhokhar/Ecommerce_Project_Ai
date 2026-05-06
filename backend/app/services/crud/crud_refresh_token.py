@@ -34,3 +34,17 @@ def create_refresh_token_record(
 
 def get_refresh_token_by_token(db: Session, token: str) -> RefreshToken | None:
     return db.scalar(select(RefreshToken).where(RefreshToken.token == token))
+
+
+def revoke_all_for_user(db: Session, user_id: int) -> None:
+    rows = db.scalars(
+        select(RefreshToken).where(
+            RefreshToken.user_id == user_id,
+            RefreshToken.is_revoked.is_(False),
+        ),
+    ).all()
+    for row in rows:
+        row.is_revoked = True
+        db.add(row)
+    if rows:
+        db.commit()

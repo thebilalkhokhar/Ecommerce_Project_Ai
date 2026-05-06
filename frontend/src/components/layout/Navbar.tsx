@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import {
   Heart,
   LayoutGrid,
@@ -23,6 +25,7 @@ import { useAuthStore, type AuthUser } from "@/store/authStore";
 import api from "@/lib/axios";
 
 export function Navbar() {
+  const router = useRouter();
   const itemCount = useCartStore(selectItemUnitCount);
   const cartHydrated = useCartStoreHydrated();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -30,6 +33,20 @@ export function Navbar() {
   const setUser = useAuthStore((s) => s.setUser);
   const logout = useAuthStore((s) => s.logout);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  async function handleLogout() {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      /* Still sign out locally if token is invalid or the request fails. */
+    }
+    logout();
+    useCartStore.getState().clearCart();
+    useCartStore.persist.clearStorage();
+    toast.success("Logged out successfully");
+    router.push("/");
+    router.refresh();
+  }
 
   useEffect(() => {
     useAuthStore.getState().initAuth();
@@ -134,7 +151,7 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <button
                     type="button"
-                    onClick={() => logout()}
+                    onClick={() => void handleLogout()}
                     className={linkDesktop}
                   >
                     <LogOut
@@ -241,7 +258,7 @@ export function Navbar() {
                     type="button"
                     className={`${linkMobile} w-full text-left`}
                     onClick={() => {
-                      logout();
+                      void handleLogout();
                       closeMobile();
                     }}
                   >
