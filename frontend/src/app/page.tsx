@@ -302,22 +302,37 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-16 pb-24">
+      <section
+        className="border-t border-primary/10 px-4 py-12 pb-24 md:py-16"
+        aria-labelledby="featured-heading"
+      >
         <div className="mx-auto w-full min-w-0 max-w-7xl">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-textMain/60">
+          <div className="flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
                 Featured
-              </h2>
-              <p className="mt-2 text-2xl font-semibold tracking-tight text-textMain">
+              </span>
+              <h2
+                id="featured-heading"
+                className="mt-3 text-2xl font-extrabold tracking-tight text-textMain md:text-3xl"
+              >
                 New in
+              </h2>
+              <p className="mt-2 max-w-2xl text-base text-textMain/70">
+                A tight edit of what just landed — same cards and detail as the
+                full catalog, without the scroll.
               </p>
             </div>
             <Link
               href="/products"
-              className="text-sm font-medium text-textMain/70 underline-offset-4 hover:text-primary hover:underline"
+              className="inline-flex w-fit shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/5 px-6 py-2.5 text-sm font-semibold tracking-wide text-textMain shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 active:scale-[0.98]"
             >
-              View all
+              View all products
+              <ArrowRight
+                className="ml-1.5 h-4 w-4 text-primary"
+                strokeWidth={1.75}
+                aria-hidden
+              />
             </Link>
           </div>
 
@@ -330,9 +345,18 @@ export default async function Home() {
               ))}
             </ul>
           ) : (
-            <p className="mt-10 rounded-lg border border-gray-200 bg-surface py-12 text-center text-sm text-textMain/70 shadow-sm">
-              Products will appear here when your catalog is ready.
-            </p>
+            <div className="mt-10 rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-6 py-14 text-center shadow-sm">
+              <p className="mx-auto max-w-md text-sm leading-relaxed text-textMain/70">
+                Products will appear here when your catalog is ready. Add items
+                in admin or check that the API is reachable.
+              </p>
+              <Link
+                href="/products"
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:opacity-95 active:scale-[0.98]"
+              >
+                Browse catalog
+              </Link>
+            </div>
           )}
         </div>
       </section>
