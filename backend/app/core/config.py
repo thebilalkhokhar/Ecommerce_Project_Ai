@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pathlib import Path
 
 from pydantic import AliasChoices, Field
@@ -48,6 +49,14 @@ class Settings(BaseSettings):
     PAYFLOW_URL: str = "https://pilot-payflowpro.paypal.com"
 
     GOOGLE_CLIENT_ID: str = ""
+
+    PAYPAL_CLIENT_ID: str = ""
+    PAYPAL_CLIENT_SECRET: str = ""
+    PAYPAL_BASE_URL: str = "https://api-m.sandbox.paypal.com"
+    PAYPAL_PKR_PER_USD: Decimal = Field(
+        default=Decimal("280.00"),
+        description="PKR per 1 USD (store totals are PKR; PayPal uses USD).",
+    )
 
 
 settings = Settings()

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 
+import httpx
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
@@ -16,6 +17,7 @@ from app.models.order import Order, PaymentStatus
 from app.models.user import User
 from app.schemas.payment import CreditCardPaymentInput
 from app.services import payflow_service
+from app.services import paypal_checkout_service as paypal_checkout
 from app.services.crud import crud_order
 
 import app.services.stripe_service  # noqa: F401
@@ -32,6 +34,19 @@ class CheckoutSessionResponse(BaseModel):
 class PayflowCheckoutOut(BaseModel):
     success: bool = True
     message: str = "Payment processed successfully"
+
+
+class PayPalCreateOrderOut(BaseModel):
+    paypal_order_id: str
+
+
+class PayPalCaptureBody(BaseModel):
+    paypal_order_id: str
+
+
+class PayPalCaptureOut(BaseModel):
+    success: bool = True
+    message: str = "Payment captured successfully"
 
 
 def _unit_amount_pkr(unit_price: Decimal) -> int:
@@ -279,3 +294,147 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)) -> dic
                     db.commit()
 
     return {"received": True}
+
+
+def _paypal_configured() -> bool:
+    return bool(settings.PAYPAL_CLIENT_ID and settings.PAYPAL_CLIENT_SECRET)
+
+
+@router.post(
+    "/paypal-create-order/{order_id}",
+    response_model=PayPalCreateOrderOut,
+)
+async def paypal_create_checkout_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PayPalCreateOrderOut:
+    if not _paypal_configured():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="PayPal is not configured",
+        )
+
+    order = crud_order.get_order_by_id(db, order_id)
+    if order is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+    if order.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized for this order",
+        )
+    if order.is_cod:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This order uses cash on delivery. PayPal is only for online payment orders.",
+        )
+    if order.payment_status != PaymentStatus.unpaid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order already paid",
+        )
+
+    try:
+        amount_usd = paypal_checkout.order_total_to_usd_string(Decimal(order.total_price))
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    try:
+        async with httpx.AsyncClient(timeout=45.0) as client:
+            access = await paypal_checkout.paypal_get_access_token(client)
+            paypal_id = await paypal_checkout.paypal_create_order(
+                client,
+                access,
+                amount_usd=amount_usd,
+                reference_id=str(order.id),
+            )
+    except paypal_checkout.PayPalAPIError as exc:
+        status_up = status.HTTP_502_BAD_GATEWAY
+        if exc.status_code is not None and 400 <= exc.status_code < 500:
+            status_up = status.HTTP_400_BAD_REQUEST
+        raise HTTPException(status_code=status_up, detail=exc.message) from exc
+
+    return PayPalCreateOrderOut(paypal_order_id=paypal_id)
+
+
+@router.post(
+    "/paypal-capture-order/{order_id}",
+    response_model=PayPalCaptureOut,
+)
+async def paypal_capture_checkout_order(
+    order_id: int,
+    body: PayPalCaptureBody,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> PayPalCaptureOut:
+    if not _paypal_configured():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="PayPal is not configured",
+        )
+
+    order = crud_order.get_order_by_id(db, order_id)
+    if order is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
+    if order.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized for this order",
+        )
+    if order.is_cod:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This order is cash on delivery.",
+        )
+    if order.payment_status != PaymentStatus.unpaid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order already paid",
+        )
+
+    paypal_oid = body.paypal_order_id.strip()
+    if not paypal_oid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="paypal_order_id is required",
+        )
+
+    try:
+        async with httpx.AsyncClient(timeout=45.0) as client:
+            access = await paypal_checkout.paypal_get_access_token(client)
+            capture_payload = await paypal_checkout.paypal_capture_order(
+                client,
+                access,
+                paypal_oid,
+            )
+    except paypal_checkout.PayPalAPIError as exc:
+        status_up = status.HTTP_502_BAD_GATEWAY
+        if exc.status_code is not None and 400 <= exc.status_code < 500:
+            status_up = status.HTTP_400_BAD_REQUEST
+        raise HTTPException(status_code=status_up, detail=exc.message) from exc
+
+    if not paypal_checkout.capture_response_is_completed(capture_payload):
+        logger.warning(
+            "PayPal capture response not COMPLETED for order %s: %s",
+            order_id,
+            capture_payload.get("status"),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="PayPal capture did not complete",
+        )
+
+    row = db.get(Order, order_id)
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Order not found after capture",
+        )
+    row.payment_status = PaymentStatus.paid
+    db.add(row)
+    db.commit()
+
+    return PayPalCaptureOut()

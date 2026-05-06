@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import api from "@/lib/axios";
+import { CheckoutPayPalEmbed } from "@/components/CheckoutPayPalEmbed";
 import { useCartStoreHydrated } from "@/components/CartStoreProvider";
 import { useAuthStore } from "@/store/authStore";
 import { useCartStore, type CartItem } from "@/store/cartStore";
@@ -56,13 +57,22 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "stripe" | "payflow">(
-    "cod",
-  );
+  const [paymentMethod, setPaymentMethod] = useState<
+    "cod" | "stripe" | "payflow" | "paypal"
+  >("cod");
 
   const [payflowCard, setPayflowCard] = useState("");
   const [payflowExpiry, setPayflowExpiry] = useState("");
   const [payflowCvv, setPayflowCvv] = useState("");
+  const [paypalCheckoutOrderId, setPaypalCheckoutOrderId] = useState<
+    number | null
+  >(null);
+
+  useEffect(() => {
+    if (paymentMethod !== "paypal") {
+      setPaypalCheckoutOrderId(null);
+    }
+  }, [paymentMethod]);
 
   const subtotal = totalPrice;
   const shippingLabel = "Free";
@@ -125,6 +135,19 @@ export default function CheckoutPage() {
         }),
         is_cod: paymentMethod === "cod",
       };
+
+      if (paymentMethod === "paypal") {
+        const { data: paypalOrder } = await api.post<OrderCreatedResponse>(
+          "/orders",
+          payload,
+        );
+        setPaypalCheckoutOrderId(paypalOrder.id);
+        toast.success("Order created. Complete payment with PayPal below.", {
+          id: toastId,
+        });
+        return;
+      }
+
       const { data: order } = await api.post<OrderCreatedResponse>(
         "/orders",
         payload,
@@ -284,6 +307,11 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-medium text-textMain mb-4">
                   Payment method
                 </h2>
+                <p className="mb-3 text-xs text-textMain/60">
+                  Totals are in PKR; PayPal Checkout charges in USD using a fixed
+                  conversion rate on the server (see{" "}
+                  <code className="text-[11px]">PAYPAL_PKR_PER_USD</code> in the API).
+                </p>
                 <div className="flex flex-col gap-3">
                   <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
                     <input
@@ -338,6 +366,25 @@ export default function CheckoutPage() {
                       </span>
                       <span className="mt-0.5 block text-xs text-textMain/70">
                         PayPal Payflow Pro — card processed on our servers.
+                      </span>
+                    </span>
+                  </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-300 bg-gray-50 p-4 transition hover:border-gray-400 has-checked:border-primary/50 has-checked:bg-primary/5">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="paypal"
+                      checked={paymentMethod === "paypal"}
+                      onChange={() => setPaymentMethod("paypal")}
+                      className="mt-1 h-4 w-4 shrink-0 border-gray-300 bg-gray-50 text-textMain focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-surface"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-textMain">
+                        PayPal
+                      </span>
+                      <span className="mt-0.5 block text-xs text-textMain/70">
+                        Pay with your PayPal account or card (checkout in USD).
                       </span>
                     </span>
                   </label>
@@ -414,11 +461,24 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 )}
+
+                {paymentMethod === "paypal" && paypalCheckoutOrderId !== null && (
+                  <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <p className="mb-3 text-xs font-medium text-textMain/70">
+                      Complete payment with PayPal
+                    </p>
+                    <CheckoutPayPalEmbed orderId={paypalCheckoutOrderId} />
+                  </div>
+                )}
               </div>
 
               <button
                 type="button"
-                disabled={submitting || items.length === 0}
+                disabled={
+                  submitting ||
+                  items.length === 0 ||
+                  (paymentMethod === "paypal" && paypalCheckoutOrderId !== null)
+                }
                 onClick={() => void handlePlaceOrder()}
                 className="w-full rounded-md bg-primary py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
@@ -427,12 +487,18 @@ export default function CheckoutPage() {
                     ? "Redirecting…"
                     : paymentMethod === "payflow"
                       ? "Processing…"
-                      : "Placing order…"
+                      : paymentMethod === "paypal"
+                        ? "Creating order…"
+                        : "Placing order…"
                   : paymentMethod === "stripe"
                     ? "Continue to payment"
                     : paymentMethod === "payflow"
                       ? "Pay with card"
-                      : "Place order"}
+                      : paymentMethod === "paypal" && paypalCheckoutOrderId !== null
+                        ? "Use PayPal button below"
+                        : paymentMethod === "paypal"
+                          ? "Create order & continue with PayPal"
+                          : "Place order"}
               </button>
 
               {!isAuthenticated && items.length > 0 && (
