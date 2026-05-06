@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { TOKEN_KEY } from "@/lib/axios";
+import { ACCESS_TOKEN_STORAGE_KEY } from "@/lib/authStorageKey";
 
 export type AuthUser = {
   id: number;
@@ -34,14 +34,14 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: (token) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
     }
     set({ token, isAuthenticated: true });
   },
 
   logout: () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
     }
     set({ token: null, user: null, isAuthenticated: false });
   },
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initAuth: () => {
     if (typeof window === "undefined") return;
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
     if (token) {
       set({ token, isAuthenticated: true });
     } else {

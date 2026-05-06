@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import api from "@/lib/axios";
+import { useWishlistIds } from "@/components/WishlistIdsProvider";
 import { useAuthStore } from "@/store/authStore";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -20,6 +21,11 @@ type WishlistApiRow = {
 
 function WishlistContent() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { productIds } = useWishlistIds();
+  const wishlistSyncKey = useMemo(
+    () => [...productIds].sort((a, b) => a - b).join(","),
+    [productIds],
+  );
   const [items, setItems] = useState<WishlistApiRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -68,7 +74,7 @@ function WishlistContent() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAuthenticated, wishlistSyncKey]);
 
   if (!bootstrapped) {
     return (

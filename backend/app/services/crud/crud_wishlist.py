@@ -29,7 +29,7 @@ def toggle_wishlist(
         Wishlist.user_id == user_id,
         Wishlist.product_id == product_id,
     )
-    existing = db.scalars(stmt).first()
+    existing = db.scalar(stmt)
     if existing is not None:
         db.delete(existing)
         db.commit()

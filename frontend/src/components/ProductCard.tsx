@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { ImageIcon } from "lucide-react";
+import { WishlistButton } from "@/components/products/WishlistButton";
+import { useWishlistIds } from "@/components/WishlistIdsProvider";
 import { useCartStore } from "@/store/cartStore";
 
 export type ProductCardData = {
@@ -27,37 +29,51 @@ function formatPrice(value: number): string {
   }).format(value);
 }
 
+const cardWishlistButtonClass =
+  "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/90 bg-white/95 text-textMain/85 shadow-md backdrop-blur-sm transition hover:scale-105 hover:bg-white hover:text-textMain disabled:cursor-not-allowed disabled:opacity-60";
+
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const { productIds } = useWishlistIds();
   const outOfStock = product.stock_quantity <= 0;
   const hasImage =
     typeof product.image_url === "string" && product.image_url.length > 0;
 
   return (
     <article className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-surface shadow-md">
-      <Link
-        href={`/products/${product.id}`}
-        className="relative aspect-square w-full overflow-hidden border-b border-gray-100 bg-gray-50 outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/40"
-      >
-        {hasImage ? (
-          <Image
-            src={product.image_url!}
-            alt={product.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <ImageIcon
-              className="h-10 w-10 text-textMain/40"
-              strokeWidth={1.25}
-              aria-hidden
+      <div className="relative aspect-square w-full overflow-hidden border-b border-gray-100 bg-gray-50">
+        <Link
+          href={`/products/${product.id}`}
+          className="relative block h-full w-full outline-none transition hover:opacity-95 focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
+          {hasImage ? (
+            <Image
+              src={product.image_url!}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-cover"
             />
-            <span className="sr-only">No product image</span>
-          </div>
-        )}
-      </Link>
+          ) : (
+            <div className="flex h-full min-h-48 w-full items-center justify-center">
+              <ImageIcon
+                className="h-10 w-10 text-textMain/40"
+                strokeWidth={1.25}
+                aria-hidden
+              />
+              <span className="sr-only">No product image</span>
+            </div>
+          )}
+        </Link>
+        <div className="pointer-events-auto absolute right-2 top-2 z-10">
+          <WishlistButton
+            productId={product.id}
+            initialIsWishlisted={productIds.has(product.id)}
+            className={cardWishlistButtonClass}
+            stopClickPropagation
+          />
+        </div>
+      </div>
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-1">

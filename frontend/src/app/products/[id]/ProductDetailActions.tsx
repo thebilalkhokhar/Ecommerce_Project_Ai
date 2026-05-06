@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import api from "@/lib/axios";
 import type { ProductDetailApi, ProductVariantApi } from "@/lib/api";
 import { WishlistButton } from "@/components/products/WishlistButton";
-import { useAuthStore } from "@/store/authStore";
+import { useWishlistIds } from "@/components/WishlistIdsProvider";
 import { useCartStore } from "@/store/cartStore";
 
 function formatPricePKR(value: number): string {
@@ -27,7 +26,7 @@ type ProductDetailActionsProps = {
   product: ProductDetailApi;
 };
 
-/** Add to cart + wishlist; hydrates wishlist heart when the user is logged in. */
+/** Add to cart + wishlist; wishlist state comes from WishlistIdsProvider. */
 export function ProductDetailActions({ product }: ProductDetailActionsProps) {
   const variants = product.variants ?? [];
   const basePrice = parsePrice(product.price);
@@ -46,45 +45,8 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
     : product.stock_quantity;
 
   const addItem = useCartStore((s) => s.addItem);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [wishlisted, setWishlisted] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    useAuthStore.getState().initAuth();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!useAuthStore.getState().isAuthenticated) {
-      setWishlisted(false);
-      setHydrated(true);
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    setHydrated(false);
-    (async () => {
-      try {
-        const { data } = await api.get<
-          Array<{ id: number; product: { id: number } }>
-        >("/wishlist");
-        if (cancelled) return;
-        const on = Array.isArray(data) && data.some((w) => w.product.id === product.id);
-        setWishlisted(on);
-      } catch {
-        if (!cancelled) setWishlisted(false);
-      } finally {
-        if (!cancelled) setHydrated(true);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated, product.id]);
+  const { productIds, ready } = useWishlistIds();
+  const wishlisted = productIds.has(product.id);
 
   return (
     <div className="mt-6 flex flex-col gap-4">
@@ -146,7 +108,7 @@ export function ProductDetailActions({ product }: ProductDetailActionsProps) {
         >
           {currentStock <= 0 ? "Out of stock" : "Add to cart"}
         </button>
-        {hydrated ? (
+        {ready ? (
           <WishlistButton
             productId={product.id}
             initialIsWishlisted={wishlisted}
