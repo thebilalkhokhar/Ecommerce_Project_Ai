@@ -103,14 +103,14 @@ function OrdersContent() {
 
   if (!bootstrapped) {
     return (
-      <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 py-8">
+      <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-4 py-8">
         <p className="text-sm text-textMain/60">Loading…</p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 py-8">
+    <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-4 py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-textMain">
         Your orders
       </h1>
@@ -149,11 +149,11 @@ function OrdersContent() {
       )}
 
       {isAuthenticated && !loading && orders.length > 0 && (
-        <ul className="mt-8 grid w-full min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
+        <ul className="mt-8 grid w-full min-w-0 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {orders.map((order) => (
             <li
               key={order.id}
-              className="flex h-full w-full flex-col gap-4 rounded-lg border border-gray-200 bg-surface p-6 shadow-md"
+              className="flex h-full min-h-0 min-w-0 flex-col gap-4 rounded-lg border border-gray-200 bg-surface p-6 shadow-md"
             >
               <div className="mb-2 flex items-start justify-between">
                 <span className="text-sm font-semibold text-textMain">
@@ -237,7 +237,7 @@ export default function OrdersPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 py-8">
+        <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-4 py-8">
           <p className="text-sm text-textMain/60">Loading…</p>
         </main>
       }
