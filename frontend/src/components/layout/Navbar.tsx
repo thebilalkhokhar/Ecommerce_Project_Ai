@@ -73,13 +73,13 @@ export function Navbar() {
   const closeMobile = () => setIsMobileMenuOpen(false);
 
   const linkDesktop =
-    "inline-flex items-center gap-2 text-sm font-medium text-textMain/70 transition-colors hover:text-textMain";
+    "inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-textMain/80 transition-all hover:bg-primary/5 hover:text-textMain active:scale-95";
 
   const linkMobile =
-    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-textMain transition-colors hover:bg-textMain/6";
+    "flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-textMain transition-all hover:bg-primary/5 active:scale-[0.98]";
 
   const iconBtn =
-    "inline-flex items-center justify-center rounded-full p-2 text-textMain/70 transition-colors hover:bg-textMain/6 hover:text-textMain";
+    "inline-flex items-center justify-center rounded-full p-2 text-textMain/70 transition-all hover:bg-primary/5 hover:text-textMain active:scale-95";
 
   return (
     <>
@@ -87,9 +87,9 @@ export function Navbar() {
       <div className="h-19 shrink-0 print:hidden md:h-20" aria-hidden />
 
       <header className="print:hidden">
-        <div className="pointer-events-none fixed top-4 left-1/2 z-50 w-[95%] max-w-5xl -translate-x-1/2">
+        <div className="pointer-events-none fixed top-4 left-1/2 z-50 w-[95%] max-w-7xl -translate-x-1/2">
           <div className="pointer-events-auto flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-2 rounded-full border border-textMain/10 bg-surface px-5 py-2.5 shadow-lg backdrop-blur-md sm:gap-3 sm:px-6 sm:py-3 md:gap-4 md:px-8 md:py-3.5">
+            <div className="flex items-center justify-between gap-2 rounded-full border border-primary/10 bg-surface/95 px-4 py-2.5 shadow-sm backdrop-blur-md sm:gap-3 sm:px-5 sm:py-3 md:gap-4 md:px-6 md:py-3">
               <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 md:flex-initial">
                 <button
                   type="button"
@@ -106,10 +106,12 @@ export function Navbar() {
                 </button>
                 <Link
                   href="/"
-                  className="truncate text-base font-semibold tracking-tight text-textMain sm:text-lg"
+                  className="min-w-0 shrink truncate"
                   onClick={closeMobile}
                 >
-                  ShopOne
+                  <span className="inline-flex max-w-full items-center truncate rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold tracking-wide text-primary sm:px-3.5 sm:py-1.5 sm:text-base">
+                    ShopOne
+                  </span>
                 </Link>
               </div>
 
@@ -183,7 +185,7 @@ export function Navbar() {
                 >
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.75} />
                   {cartHydrated && itemCount > 0 && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-secondary px-1 text-[10px] font-medium text-textMain transition-opacity duration-150">
+                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white shadow-sm transition-opacity duration-150">
                       {itemCount > 99 ? "99+" : itemCount}
                     </span>
                   )}
@@ -192,7 +194,7 @@ export function Navbar() {
             </div>
 
             <div
-              className={`md:hidden overflow-hidden rounded-2xl border border-textMain/10 bg-surface shadow-md transition-all duration-300 ease-in-out ${
+              className={`md:hidden overflow-hidden rounded-2xl border border-primary/10 bg-surface/95 shadow-sm transition-all duration-300 ease-in-out ${
                 isMobileMenuOpen
                   ? "max-h-112 opacity-100"
                   : "pointer-events-none max-h-0 border-transparent opacity-0 shadow-none"
