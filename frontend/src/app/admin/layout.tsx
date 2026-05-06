@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
   LayoutGrid,
   LogOut,
@@ -27,8 +29,10 @@ const NAV: readonly { href: string; label: string; icon: typeof LayoutDashboard 
     { href: "/admin/reviews", label: "Reviews", icon: MessageSquare },
   ];
 
-function navItemClass(active: boolean) {
-  return `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+function navItemClass(active: boolean, expanded: boolean) {
+  return `flex items-center rounded-xl py-2.5 text-sm font-medium transition-colors ${
+    expanded ? "gap-3 px-3" : "justify-center px-0"
+  } ${
     active
       ? "bg-primary/10 text-primary"
       : "text-textMain/75 hover:bg-textMain/5 hover:text-textMain"
@@ -56,6 +60,24 @@ export default function AdminLayout({
 
   const [checked, setChecked] = useState(false);
   const [ok, setOk] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem("admin-sidebar-expanded");
+    if (saved === "0") setSidebarExpanded(false);
+    if (saved === "1") setSidebarExpanded(true);
+  }, []);
+
+  function toggleSidebar() {
+    setSidebarExpanded((e) => {
+      const next = !e;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("admin-sidebar-expanded", next ? "1" : "0");
+      }
+      return next;
+    });
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -148,55 +170,94 @@ export default function AdminLayout({
     return null;
   }
 
+  const asideW = sidebarExpanded ? "w-64" : "w-[4.5rem]";
+  /** left-4 (1rem) + sidebar width + margin to content — extra gap so content is not flush */
+  const contentPad = sidebarExpanded
+    ? "pl-[calc(1rem+16rem+1.75rem)]"
+    : "pl-[calc(1rem+4.5rem+1.75rem)]";
+
   return (
     <div className="min-h-screen bg-background">
       <aside
-        className="fixed left-4 top-4 z-40 flex h-[calc(100vh-2rem)] w-64 flex-col overflow-hidden rounded-3xl border border-textMain/10 bg-surface shadow-lg"
+        className={`fixed left-4 top-4 z-40 flex h-[calc(100vh-2rem)] ${asideW} flex-col overflow-hidden rounded-3xl border border-textMain/10 bg-surface shadow-lg transition-[width] duration-200 ease-out`}
         aria-label="Admin navigation"
       >
-        <div className="border-b border-textMain/8 px-4 py-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-textMain/50">
-            ShopOne
-          </p>
-          <p className="mt-1 text-base font-semibold text-textMain">
-            Admin Console
-          </p>
+        <div
+          className={`flex shrink-0 items-center gap-2 border-b border-textMain/8 py-4 ${
+            sidebarExpanded ? "justify-between px-4" : "flex-col px-2"
+          }`}
+        >
+          {sidebarExpanded ? (
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-textMain/50">
+                ShopOne
+              </p>
+              <p className="mt-1 truncate text-base font-semibold text-textMain">
+                Admin Console
+              </p>
+            </div>
+          ) : (
+            <p className="sr-only">ShopOne Admin</p>
+          )}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-textMain/10 bg-background text-textMain/70 transition-colors hover:border-primary/25 hover:bg-primary/5 hover:text-textMain"
+            aria-expanded={sidebarExpanded}
+            aria-label={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {sidebarExpanded ? (
+              <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+            ) : (
+              <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+            )}
+          </button>
         </div>
 
-        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2 sm:p-3">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = pathIsActive(pathname, href);
             return (
               <Link
                 key={href}
                 href={href}
-                className={navItemClass(active)}
+                title={sidebarExpanded ? undefined : label}
+                className={navItemClass(active, sidebarExpanded)}
               >
                 <Icon
                   className="h-4 w-4 shrink-0 opacity-90"
                   strokeWidth={1.75}
                   aria-hidden
                 />
-                {label}
+                {sidebarExpanded ? (
+                  label
+                ) : (
+                  <span className="sr-only">{label}</span>
+                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-textMain/8 p-3">
+        <div className="border-t border-textMain/8 p-2 sm:p-3">
           <button
             type="button"
             onClick={() => void handleLogout()}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-textMain/75 transition-colors hover:bg-red-50 hover:text-red-700"
+            title={sidebarExpanded ? undefined : "Logout"}
+            className={`flex w-full items-center rounded-xl py-2.5 text-left text-sm font-medium text-textMain/75 transition-colors hover:bg-red-50 hover:text-red-700 ${
+              sidebarExpanded ? "gap-3 px-3" : "justify-center px-0"
+            }`}
           >
             <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-            Logout
+            {sidebarExpanded ? "Logout" : <span className="sr-only">Logout</span>}
           </button>
         </div>
       </aside>
 
-      <div className="min-h-screen pl-68 pr-4 pb-6 pt-4 md:pl-70 md:pr-6 md:pt-6">
-        <main className="min-w-0">{children}</main>
+      <div
+        className={`min-h-screen pb-6 pr-5 pt-4 transition-[padding-left] duration-200 ease-out md:pr-10 md:pt-6 lg:pr-12 ${contentPad}`}
+      >
+        <main className="min-w-0 max-w-[1600px]">{children}</main>
       </div>
     </div>
   );
