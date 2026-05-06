@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CreditCard, Package, Search, ShoppingBag } from "lucide-react";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 
 const HERO_IMAGE =
@@ -121,6 +121,132 @@ export default async function Home() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      <section
+        className="border-t border-primary/10 px-4 py-12 md:py-16"
+        aria-labelledby="how-to-order-heading"
+      >
+        <div className="mx-auto w-full min-w-0 max-w-7xl">
+          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+            Simple flow
+          </span>
+          <h2
+            id="how-to-order-heading"
+            className="mt-3 text-2xl font-extrabold tracking-tight text-textMain md:text-3xl"
+          >
+            How to order
+          </h2>
+          <p className="mt-2 max-w-2xl text-base text-textMain/70">
+            From discovery to delivery — four quick steps. No clutter, no
+            guesswork.
+          </p>
+          <ol className="mt-10 grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <li className="min-w-0">
+              <div className="flex h-full flex-col rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm transition-all hover:border-primary/15 hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                    1
+                  </span>
+                  <div className="inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+                    <Search className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                  </div>
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-textMain">
+                  Browse &amp; search
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-textMain/70">
+                  Open{" "}
+                  <Link
+                    href="/products"
+                    className="font-medium text-primary underline-offset-2 hover:underline"
+                  >
+                    Products
+                  </Link>{" "}
+                  or pick a category. Use search when you know what you want.
+                </p>
+              </div>
+            </li>
+            <li className="min-w-0">
+              <div className="flex h-full flex-col rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm transition-all hover:border-primary/15 hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                    2
+                  </span>
+                  <div className="inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+                    <ShoppingBag
+                      className="h-5 w-5"
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                  </div>
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-textMain">
+                  Add to cart
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-textMain/70">
+                  Choose variants if needed, then add items. Review everything in
+                  your{" "}
+                  <Link
+                    href="/cart"
+                    className="font-medium text-primary underline-offset-2 hover:underline"
+                  >
+                    cart
+                  </Link>{" "}
+                  before checkout.
+                </p>
+              </div>
+            </li>
+            <li className="min-w-0">
+              <div className="flex h-full flex-col rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm transition-all hover:border-primary/15 hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                    3
+                  </span>
+                  <div className="inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+                    <CreditCard
+                      className="h-5 w-5"
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                  </div>
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-textMain">
+                  Checkout &amp; pay
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-textMain/70">
+                  Enter shipping details and pay securely online, or choose cash
+                  on delivery where available.
+                </p>
+              </div>
+            </li>
+            <li className="min-w-0">
+              <div className="flex h-full flex-col rounded-2xl border border-primary/10 bg-surface p-6 shadow-sm transition-all hover:border-primary/15 hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                    4
+                  </span>
+                  <div className="inline-flex rounded-lg bg-primary/10 p-2 text-primary">
+                    <Package className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                  </div>
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-textMain">
+                  Track your order
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-textMain/70">
+                  Sign in anytime to see updates under{" "}
+                  <Link
+                    href="/orders"
+                    className="font-medium text-primary underline-offset-2 hover:underline"
+                  >
+                    Orders
+                  </Link>
+                  . We&apos;ll keep your receipt handy too.
+                </p>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
 
